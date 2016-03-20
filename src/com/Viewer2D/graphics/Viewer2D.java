@@ -13,6 +13,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -20,8 +21,6 @@ import javax.swing.JComponent;
 
 import com.Viewer2D.data.Camera;
 import com.Viewer2D.data.Viewport;
-import com.Viewer2D.data.World2D;
-import com.Viewer2D.geometry.Point;
 import com.Viewer2D.geometry.Shape2D;
 
 import math2D.Transformation2D;
@@ -31,9 +30,10 @@ import math2D.Vecteur2D;
 public class Viewer2D extends JComponent implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener, Observer {
 	
 	private static final long serialVersionUID = 1L;
-	private World2D world;
 	private Camera camera;
 	private Viewport viewport;
+	
+	private ArrayList<Shape2D> listShape;
 	
 	private BasicStroke stroke, axeStroke;
 	private Transformation2D screenMVP;
@@ -47,12 +47,12 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 	private boolean zoomable = true;
 	
 	/** Contructeur */
-	public Viewer2D(World2D world, Camera camera, int width, int height) {
+	public Viewer2D(Camera camera, int width, int height) {
 		super();
-		this.world = world;
 		this.camera = camera;
-		
 		this.viewport = new Viewport(0, 0, width, height);
+		
+		this.listShape = new ArrayList<Shape2D>();
 		
 		this.stroke = new BasicStroke();
 		this.axeStroke = new BasicStroke(3.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL);
@@ -66,23 +66,18 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 	}
 	
 	/** Contructeur */
-	public Viewer2D(World2D world, Camera camera) {
-		this(world, camera, 640, 480);
-	}
-	
-	/** Contructeur */
-	public Viewer2D(World2D world) {
-		this(world, new Camera());
+	public Viewer2D(Camera camera) {
+		this(camera, 640, 480);
 	}
 	
 	/** Contructeur */
 	public Viewer2D() {
-		this(new World2D());
+		this(new Camera());
 	}
 	
-	/** Retourne le model */
-	public World2D getModel() {
-		return world;
+	/** Retourne la liste des Shape2D */
+	public final ArrayList<Shape2D> getListShape() {
+		return listShape;
 	}
 	
 	/** Retourne l'unite e la grile */
@@ -103,6 +98,16 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 	/** Indique si la camera peut zoomer */
 	public boolean getZoomable() {
 		return zoomable;
+	}
+	
+	/** Ajoute une Shaped2D a afficher dans le viewer */
+	public void addShape(Shape2D shape) {
+		listShape.add(shape);
+	}
+	
+	/** Retire une Shaped2D du viewer */
+	public void removeShape(Shape2D shape) {
+		listShape.remove(shape);
 	}
 	
 	/** Met a jour l'unite de la grille */
@@ -273,16 +278,9 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 		drawGrid(g2);
 		
 		// Affichage des formes
-		for (Shape2D shape : world.getListShape()) {
+		for (Shape2D shape : getListShape()) {
 			g2.setColor(shape.getColor());
 			drawShape(g2, shape);
-		}
-		
-		// Afichage des points
-		for (Point point : world.getListPoint()) {
-			screenMVP = Transformation2D.addTransformation(viewProjScreen, point.getModel());
-			g2.setColor(point.getColor());
-			drawPoint(g2, new Point2D(point.getPoint2D()));
 		}
 		
 		if (eventButton == 2) {
