@@ -71,6 +71,19 @@ public class Shape2D {
 		return new Rectangle2D.Double(minX, minY, maxX-minX, maxY-minY);
 	}
 	
+	/** Calcul et retourne l'air du polygone */
+	public double computeArea() {
+		double area = 0.0;
+		int j = getNPoint() - 1;
+		for (int i = 0; i < getNPoint(); i++) {
+			Point2D iPoint = points[i];
+			Point2D jPoint = points[j];
+			area += (jPoint.getX() + iPoint.getX()) * (jPoint.getY() - iPoint.getY());
+			j = i;
+		}
+		return Math.abs(area / 2.0);
+	}
+	
 	/** Retourne vrai si le point (x, y) est a l'interieur du polygone */
 	public boolean isInside(double x, double y) {
 		if (!computeBoundingBox().contains(x, y)) {

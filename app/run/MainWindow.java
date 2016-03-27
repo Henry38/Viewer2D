@@ -36,7 +36,6 @@ public class MainWindow extends JFrame {
 	public void addShape() {
 		Rectangle c = new Rectangle(4, 2);
 		c.rotate(Math.PI / 16);
-		c.setOx(2);
 		
 		viewer.addShape(c);
 	}

@@ -34,5 +34,6 @@ public class Application {
 				fen.setVisible(true);
 			}
 		});
+		
 	}
 }
