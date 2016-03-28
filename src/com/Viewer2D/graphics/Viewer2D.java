@@ -23,6 +23,7 @@ import com.Viewer2D.data.Camera;
 import com.Viewer2D.data.Viewport;
 import com.Viewer2D.geometry.Shape2D;
 
+import math2D.Base2D;
 import math2D.Transformation2D;
 import math2D.Point2D;
 import math2D.Vecteur2D;
@@ -166,6 +167,22 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 		g2.drawLine((int) proj_p2.getX(), (int) proj_p2.getY(), (int) proj_p.getX(), (int) proj_p.getY());
 	}
 	
+	public void drawArrow(Graphics g2, Point2D point, Vecteur2D vect) {
+		Point2D p = new Point2D(point);
+		p.translation(vect);
+		drawArrow(g2, point, p);
+	}
+	
+	public void drawBase(Graphics2D g2, Base2D base) {
+		Point2D o = base.getOrigine();
+		Vecteur2D ox = base.getOx();
+		Vecteur2D oy = base.getOy();
+		g2.setColor(Color.green);
+		drawArrow(g2, o, ox);
+		g2.setColor(Color.blue);
+		drawArrow(g2, o, oy);
+	}
+	
 	public void drawShape(Graphics2D g2, Shape2D shape) {
 		int[] xpoints = new int[shape.getNPoint()];
 		int[] ypoints = new int[shape.getNPoint()];
@@ -281,6 +298,9 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 		for (Shape2D shape : getListShape()) {
 			g2.setColor(shape.getColor());
 			drawShape(g2, shape);
+			//drawBase(g2, shape.getModel().toBase2D());
+			g2.setColor(Color.black);
+			drawPoint(g2, shape.getBarycenter());
 		}
 		
 		if (eventButton == 2) {

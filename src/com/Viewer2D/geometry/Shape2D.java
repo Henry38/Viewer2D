@@ -10,6 +10,7 @@ public class Shape2D {
 	
 	private Transformation2D transform;
 	private Point2D[] points;
+	private Point2D barycenter;
 	private int npoints;
 	private double ox, oy;
 	private Color color;
@@ -23,14 +24,21 @@ public class Shape2D {
 		setColor(Color.red);
 	}
 	
-	/** Retourne la Transforma<tion2D de la Shape2D */
-	public final Transformation2D getModel() {
+	/** Retourne la Transformation2D de la Shape2D */
+	public Transformation2D getModel() {
 		return transform;
 	}
 	
 	/** Retourne le point n°index */
-	public final Point2D getPoint(int index) {
+	public Point2D getPoint(int index) {
 		Point2D p = new Point2D(points[index]);
+		p.translation(-getOx(), -getOy());
+		return getModel().transform(p);
+	}
+	
+	/** Retourne le centre d'inertie de la Shaped2D */
+	public Point2D getBarycenter() {
+		Point2D p = new Point2D(barycenter);
 		p.translation(-getOx(), -getOy());
 		return getModel().transform(p);
 	}
@@ -53,35 +61,6 @@ public class Shape2D {
 	/** Retourne la couleur de la Shape2D */
 	public Color getColor() {
 		return color;
-	}
-	
-	/** Calcul et retourne la boundingBox */
-	public Rectangle2D.Double computeBoundingBox() {
-		double minX = Double.MAX_VALUE;
-		double minY = Double.MAX_VALUE;
-		double maxX = Double.MIN_VALUE;
-		double maxY = Double.MIN_VALUE;
-		for (int i = 0; i < npoints; i++) {
-			Point2D point = getPoint(i);
-			minX = Math.min(minX, point.getX());
-			minY = Math.min(minY, point.getY());
-			maxX = Math.max(maxX, point.getX());
-			maxY = Math.max(maxY, point.getY());
-		}
-		return new Rectangle2D.Double(minX, minY, maxX-minX, maxY-minY);
-	}
-	
-	/** Calcul et retourne l'air du polygone */
-	public double computeArea() {
-		double area = 0.0;
-		int j = getNPoint() - 1;
-		for (int i = 0; i < getNPoint(); i++) {
-			Point2D iPoint = points[i];
-			Point2D jPoint = points[j];
-			area += (jPoint.getX() + iPoint.getX()) * (jPoint.getY() - iPoint.getY());
-			j = i;
-		}
-		return Math.abs(area / 2.0);
 	}
 	
 	/** Retourne vrai si le point (x, y) est a l'interieur du polygone */
@@ -121,10 +100,44 @@ public class Shape2D {
 	/** Met a jour les points formant la Shape2D */
 	public void setPoint(double[] xpoints, double[] ypoints, int npoints) {
 		this.points = new Point2D[npoints];
+		double bx = 0.0;
+		double by = 0.0;
 		for (int i = 0; i < npoints; i++) {
 			points[i] = new Point2D(xpoints[i], ypoints[i]);
+			bx += xpoints[i];
+			by += ypoints[i];
 		}
+		this.barycenter = new Point2D(bx / npoints, by / npoints);
 		this.npoints = npoints;
+	}
+	
+	/** Calcul et retourne la boundingBox */
+	public Rectangle2D.Double computeBoundingBox() {
+		double minX = Double.MAX_VALUE;
+		double minY = Double.MAX_VALUE;
+		double maxX = Double.MIN_VALUE;
+		double maxY = Double.MIN_VALUE;
+		for (int i = 0; i < npoints; i++) {
+			Point2D point = getPoint(i);
+			minX = Math.min(minX, point.getX());
+			minY = Math.min(minY, point.getY());
+			maxX = Math.max(maxX, point.getX());
+			maxY = Math.max(maxY, point.getY());
+		}
+		return new Rectangle2D.Double(minX, minY, maxX-minX, maxY-minY);
+	}
+	
+	/** Calcul et retourne l'air du polygone */
+	public double computeArea() {
+		double area = 0.0;
+		int j = getNPoint() - 1;
+		for (int i = 0; i < getNPoint(); i++) {
+			Point2D iPoint = points[i];
+			Point2D jPoint = points[j];
+			area += (jPoint.getX() + iPoint.getX()) * (jPoint.getY() - iPoint.getY());
+			j = i;
+		}
+		return Math.abs(area / 2.0);
 	}
 	
 	/** Ajoute une translation a la transformation */
