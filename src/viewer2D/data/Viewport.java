@@ -1,4 +1,4 @@
-package com.Viewer2D.data;
+package viewer2D.data;
 
 import math2D.Transformation2D;
 

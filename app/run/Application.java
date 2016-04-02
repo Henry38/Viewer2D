@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.SwingUtilities;
 
-import com.Viewer2D.data.Camera;
+import viewer2D.data.Camera;
 
 public class Application {
 	

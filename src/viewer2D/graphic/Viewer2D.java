@@ -1,4 +1,4 @@
-package com.Viewer2D.graphics;
+package viewer2D.graphic;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -7,36 +7,35 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
-
 import javax.swing.JComponent;
 
-import com.Viewer2D.data.Camera;
-import com.Viewer2D.data.Viewport;
-import com.Viewer2D.geometry.Shape2D;
-
+import viewer2D.controler.WorldModelListener;
+import viewer2D.data.Camera;
+import viewer2D.data.Viewport;
+import viewer2D.data.WorldModel;
+import viewer2D.geometry.Shape2D;
 import math2D.Base2D;
 import math2D.Transformation2D;
 import math2D.Point2D;
 import math2D.Vecteur2D;
 
-public class Viewer2D extends JComponent implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener, Observer {
+public class Viewer2D extends JComponent {
 	
 	private static final long serialVersionUID = 1L;
+	public static final String MODEL_CHANGED_PROPERTY = "model";
+	
+	private WorldModel model;
 	private Camera camera;
 	private Viewport viewport;
+	private Handler handler;
 	
-	private ArrayList<Shape2D> listShape;
-	
-	private BasicStroke stroke, axeStroke;
+	private BasicStroke gridStroke, axisStroke;
 	private Transformation2D screenMVP;
 	private int lineClicked = 0;
 	private int columnClicked = 0;
@@ -48,38 +47,63 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 	private boolean zoomable = true;
 	
 	/** Contructeur */
-	public Viewer2D(Camera camera, int width, int height) {
+	public Viewer2D(WorldModel model, int width, int height) {
 		super();
-		this.camera = camera;
+		this.model = null;
+		this.camera = new Camera();
 		this.viewport = new Viewport(0, 0, width, height);
+		this.handler = new Handler();
 		
-		this.listShape = new ArrayList<Shape2D>();
+		setModel(model);
 		
-		this.stroke = new BasicStroke();
-		this.axeStroke = new BasicStroke(3.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL);
+		this.gridStroke = new BasicStroke();
+		this.axisStroke = new BasicStroke(3.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL);
 		
-		this.addMouseListener(this);
-		this.addMouseMotionListener(this);
-		this.addMouseWheelListener(this);
-		this.addComponentListener(this);
+		this.addMouseListener(getHandler());
+		this.addMouseMotionListener(getHandler());
+		this.addMouseWheelListener(getHandler());
+		this.addComponentListener(getHandler());
 		
 		this.setPreferredSize(new Dimension(width, height));
 	}
 	
 	/** Contructeur */
-	public Viewer2D(Camera camera) {
-		this(camera, 640, 480);
+	public Viewer2D(int width, int height) {
+		this(new WorldModel(), width, height);
 	}
 	
 	/** Contructeur */
 	public Viewer2D() {
-		this(new Camera());
+		this(640, 480);
 	}
 	
-	/** Retourne la liste des Shape2D */
-	public final ArrayList<Shape2D> getListShape() {
-		return listShape;
+	/** Retourne le modele */
+	public WorldModel getModel() {
+		return model;
 	}
+	
+	/** Retourne le handler sur le Viewer2D */
+	private Handler getHandler() {
+		return handler;
+	}
+	
+	/** Met a jour le modele */
+	public void setModel(WorldModel newModel) {
+		WorldModel oldModel = getModel();
+		
+		if (oldModel != null) {
+			oldModel.removeWorldListener(getHandler());
+		}
+		
+		model = newModel;
+		
+		if (newModel != null) {
+			newModel.addWorldListener(getHandler());
+		}
+		
+		firePropertyChange(MODEL_CHANGED_PROPERTY, oldModel, model);
+	}
+	
 	
 	/** Retourne l'unite e la grile */
 	public int getUnity() {
@@ -101,15 +125,15 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 		return zoomable;
 	}
 	
-	/** Ajoute une Shaped2D a afficher dans le viewer */
-	public void addShape(Shape2D shape) {
-		listShape.add(shape);
-	}
-	
-	/** Retire une Shaped2D du viewer */
-	public void removeShape(Shape2D shape) {
-		listShape.remove(shape);
-	}
+//	/** Ajoute une Shaped2D a afficher dans le viewer */
+//	public void addShape(Shape2D shape) {
+//		listShape.add(shape);
+//	}
+//	
+//	/** Retire une Shaped2D du viewer */
+//	public void removeShape(Shape2D shape) {
+//		listShape.remove(shape);
+//	}
 	
 	/** Met a jour l'unite de la grille */
 	public void setUnity(int value) {
@@ -174,6 +198,7 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 	}
 	
 	public void drawBase(Graphics2D g2, Base2D base) {
+		g2.setStroke(axisStroke);
 		Point2D o = base.getOrigine();
 		Vecteur2D ox = base.getOx();
 		Vecteur2D oy = base.getOy();
@@ -187,11 +212,17 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 		int[] xpoints = new int[shape.getNPoint()];
 		int[] ypoints = new int[shape.getNPoint()];
 		for (int i = 0; i < shape.getNPoint(); i++) {
-			Point2D proj_p = screenMVP.transform(shape.getPoint(i));
+			Point2D proj_p = screenMVP.transform(shape.getPoint2D(i));
 			xpoints[i] = (int) proj_p.getX();
 			ypoints[i] = (int) proj_p.getY();
 		}
+		g2.setColor(shape.getColor());
 		g2.fillPolygon(xpoints, ypoints, shape.getNPoint());
+		if (shape.getStroke() != null) {
+			g2.setColor(Color.black);
+			g2.setStroke(shape.getStroke());
+			g2.drawPolygon(xpoints, ypoints, shape.getNPoint());
+		}
 	}
 	
 	public void drawGrid(Graphics2D g2) {
@@ -244,10 +275,10 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 			point2.setX(x);
 			if (x == 0) {
 				g2.setColor(Color.black);
-				g2.setStroke(axeStroke);
+				g2.setStroke(axisStroke);
 			} else {
 				g2.setColor(Color.gray);
-				g2.setStroke(stroke);
+				g2.setStroke(gridStroke);
 			}
 			drawLine(g2, point1, point2);
 		}
@@ -258,10 +289,10 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 			point2.setY(y);
 			if (y == 0) {
 				g2.setColor(Color.black);
-				g2.setStroke(axeStroke);
+				g2.setStroke(axisStroke);
 			} else {
 				g2.setColor(Color.gray);
-				g2.setStroke(stroke);
+				g2.setStroke(gridStroke);
 			}
 			drawLine(g2, point1, point2);
 		}
@@ -270,7 +301,7 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 		point1.setX(0);
 		point1.setY(0);
 		g2.setColor(Color.red);
-		g2.setStroke(axeStroke);
+		g2.setStroke(axisStroke);
 		point2.setX(1);
 		point2.setY(0);
 		drawArrow(g2, point1, point2);
@@ -295,116 +326,125 @@ public class Viewer2D extends JComponent implements MouseListener, MouseMotionLi
 		drawGrid(g2);
 		
 		// Affichage des formes
-		for (Shape2D shape : getListShape()) {
-			g2.setColor(shape.getColor());
+		for (Shape2D shape : model.getListShape()) {
 			drawShape(g2, shape);
-			//drawBase(g2, shape.getModel().toBase2D());
-			g2.setColor(Color.black);
-			drawPoint(g2, shape.getBarycenter());
+			drawBase(g2, shape.getModel().toBase2D());
+//			g2.setColor(Color.black);
+//			drawPoint(g2, shape.getBarycenter());
 		}
 		
 		if (eventButton == 2) {
 			g2.setColor(Color.darkGray);
-			g2.setStroke(stroke);
+			g2.setStroke(gridStroke);
 			g2.drawLine(getWidth() / 2, getHeight() / 2, columnClicked, lineClicked);
 		}
 	}
 	
 	
-	@Override
-	public void mouseClicked(MouseEvent ev) {}
-	
-	@Override
-	public void mouseEntered(MouseEvent ev) {}
-	
-	@Override
-	public void mouseExited(MouseEvent ev) {}
-	
-	@Override
-	public void mousePressed(MouseEvent ev) {
-		columnClicked = ev.getX();
-		lineClicked = ev.getY();
-		eventButton = ev.getButton();
-		
-		if (eventButton == 1 && !getMoveable()) {
-			columnClicked = 0;
-			lineClicked = 0;
-			eventButton = 0;
-		}
-		
-		if (eventButton == 2 && !getSpinnable()) {
-			columnClicked = 0;
-			lineClicked = 0;
-			eventButton = 0;
-		}
-	}
-	
-	@Override
-	public void mouseReleased(MouseEvent ev) {
-		if (eventButton == 2) {
+	/** Classe qui ecoute le modele et les click utilisateur */
+	private class Handler extends MouseAdapter implements WorldModelListener, MouseMotionListener, MouseWheelListener, ComponentListener {
+
+		///
+		/// ComponentListener
+		///
+		@Override
+		public void shapeAdded(Shape2D shape) { }
+
+		@Override
+		public void shapeRemoved(Shape2D shape) { }
+
+		@Override
+		public void needRefresh() {
 			repaint();
 		}
-		eventButton = 0;
-	}
-	
-	@Override
-	public void mouseDragged(MouseEvent ev) {
-		Rectangle2D.Double rect = camera.getRectangle();
-		double dx = ((double) (columnClicked - ev.getX()) / getWidth()) * rect.getWidth();
-		double dy = ((double) (lineClicked - ev.getY()) / getHeight()) * rect.getHeight();
 		
-		// Left click
-		if (eventButton == MouseEvent.BUTTON1) {
-			camera.addTranslation(dx, -dy);
-		}
-		
-		// Right click
-		if (eventButton == MouseEvent.BUTTON2) {
-			Vecteur2D or = new Vecteur2D(columnClicked - getWidth() / 2, lineClicked - getHeight() / 2);
-			Vecteur2D op = new Vecteur2D(ev.getX() - getWidth() / 2, ev.getY() - getHeight() / 2);
-			if (or.getNorme() > 0 && op.getNorme() > 0) {
-				or.normalized();
-				op.normalized();
-				double radianOR = Math.atan2(or.getDy(), or.getDx());
-				double radianOP = Math.atan2(op.getDy(), op.getDx());
-				camera.addRotation(radianOP - radianOR);
+		///
+		/// MouseListener
+		///
+		@Override
+		public void mousePressed(MouseEvent ev) {
+			columnClicked = ev.getX();
+			lineClicked = ev.getY();
+			eventButton = ev.getButton();
+			
+			if (eventButton == 1 && !getMoveable()) {
+				columnClicked = 0;
+				lineClicked = 0;
+				eventButton = 0;
+			}
+			
+			if (eventButton == 2 && !getSpinnable()) {
+				columnClicked = 0;
+				lineClicked = 0;
+				eventButton = 0;
 			}
 		}
 		
-		repaint();
-		columnClicked = ev.getX();
-		lineClicked = ev.getY();
-	}
-	
-	@Override
-	public void mouseMoved(MouseEvent ev) {}
-	
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent ev) {
-		if (getZoomable()) {
-			camera.addZoom(-ev.getWheelRotation() * (camera.getZ() / 10.0));
+		@Override
+		public void mouseReleased(MouseEvent ev) {
+			if (eventButton == 2) {
+				repaint();
+			}
+			eventButton = 0;
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent ev) {
+			Rectangle2D.Double rect = camera.getRectangle();
+			double dx = ((double) (columnClicked - ev.getX()) / getWidth()) * rect.getWidth();
+			double dy = ((double) (lineClicked - ev.getY()) / getHeight()) * rect.getHeight();
+			
+			// Left click
+			if (eventButton == MouseEvent.BUTTON1) {
+				camera.addTranslation(dx, -dy);
+			}
+			
+			// Right click
+			if (eventButton == MouseEvent.BUTTON2) {
+				Vecteur2D or = new Vecteur2D(columnClicked - getWidth() / 2, lineClicked - getHeight() / 2);
+				Vecteur2D op = new Vecteur2D(ev.getX() - getWidth() / 2, ev.getY() - getHeight() / 2);
+				if (or.getNorme() > 0 && op.getNorme() > 0) {
+					or.normalized();
+					op.normalized();
+					double radianOR = Math.atan2(or.getDy(), or.getDx());
+					double radianOP = Math.atan2(op.getDy(), op.getDx());
+					camera.addRotation(radianOP - radianOR);
+				}
+			}
+			
+			repaint();
+			columnClicked = ev.getX();
+			lineClicked = ev.getY();
+		}
+		
+		///
+		/// MouseWheelEvent
+		///
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent ev) {
+			if (getZoomable()) {
+				camera.addZoom(-ev.getWheelRotation() * (camera.getZ() / 10.0));
+				repaint();
+			}
+		}
+		
+		///
+		/// ComponentListener
+		///
+		@Override
+		public void componentHidden(ComponentEvent ev) {}
+		
+		@Override
+		public void componentMoved(ComponentEvent ev) {}
+		
+		@Override
+		public void componentResized(ComponentEvent ev) {
+			viewport.setWidth(getWidth());
+			viewport.setHeight(getHeight());
 			repaint();
 		}
-	}
-	
-	@Override
-	public void componentHidden(ComponentEvent ev) {}
-	
-	@Override
-	public void componentMoved(ComponentEvent ev) {}
-	
-	@Override
-	public void componentResized(ComponentEvent ev) {
-		viewport.setWidth(getWidth());
-		viewport.setHeight(getHeight());
-		repaint();
-	}
-	
-	@Override
-	public void componentShown(ComponentEvent ev) {}
-	
-	@Override
-	public void update(Observable obs, Object obj) {
-		repaint();
+		
+		@Override
+		public void componentShown(ComponentEvent ev) {}		
 	}
 }

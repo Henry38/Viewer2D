@@ -1,19 +1,20 @@
-package com.Viewer2D.geometry;
+package viewer2D.geometry;
 
 import java.awt.Color;
-import java.awt.geom.Rectangle2D;
-
+import java.awt.Stroke;
 import math2D.Point2D;
 import math2D.Transformation2D;
 
 public class Shape2D {
 	
-	private Transformation2D transform;
-	private Point2D[] points;
-	private Point2D barycenter;
-	private int npoints;
-	private double ox, oy;
-	private Color color;
+	protected Transformation2D transform;
+	protected Point2D[] points;
+	protected Point2D barycenter;
+	protected int npoints;
+	protected double ox, oy;
+	
+	protected Color color;
+	protected Stroke stroke;
 	
 	/** Constructeur */
 	public Shape2D(double[] xpoints, double[] ypoints, int npoints) {
@@ -22,6 +23,7 @@ public class Shape2D {
 		setOx(0);
 		setOy(0);
 		setColor(Color.red);
+		setStroke(null);
 	}
 	
 	/** Retourne la Transformation2D de la Shape2D */
@@ -29,18 +31,21 @@ public class Shape2D {
 		return transform;
 	}
 	
-	/** Retourne le point n°index */
-	public Point2D getPoint(int index) {
-		Point2D p = new Point2D(points[index]);
+	/** Retourne le Point2D monde du Point2D local exprime dans le repere local */
+	public Point2D getPoint2D(Point2D point) {
+		Point2D p = new Point2D(point);
 		p.translation(-getOx(), -getOy());
 		return getModel().transform(p);
 	}
 	
+	/** Retourne le point n°index dans les coordonnees du monde */
+	public Point2D getPoint2D(int index) {
+		return getPoint2D(points[index]);
+	}
+	
 	/** Retourne le centre d'inertie de la Shaped2D */
 	public Point2D getBarycenter() {
-		Point2D p = new Point2D(barycenter);
-		p.translation(-getOx(), -getOy());
-		return getModel().transform(p);
+		return barycenter;
 	}
 	
 	/** Retourne le nombre de points */
@@ -63,23 +68,9 @@ public class Shape2D {
 		return color;
 	}
 	
-	/** Retourne vrai si le point (x, y) est a l'interieur du polygone */
-	public boolean isInside(double x, double y) {
-		if (!computeBoundingBox().contains(x, y)) {
-			return false;
-		}
-		boolean inside = false;
-		int j = getNPoint() - 1;
-		for (int i = 0; i < getNPoint(); i++) {
-			Point2D iPoint = getPoint(i);
-			Point2D jPoint = getPoint(j);
-			if ( ((iPoint.getY() > y) != (jPoint.getY() > y)) &&
-					(x < (jPoint.getX()-iPoint.getX()) * (y-iPoint.getY()) / (jPoint.getY()-iPoint.getY()) + iPoint.getX()) ) {
-				inside = !inside;
-			}
-			j = i;
-		}
-		return inside;
+	/** Retourne la couleur de la Shape2D */
+	public Stroke getStroke() {
+		return stroke;
 	}
 	
 	/** Met a jour la coordonnee X de l'oigine */
@@ -97,6 +88,11 @@ public class Shape2D {
 		this.color = color;
 	}
 	
+	/** Met a jour la bordure */
+	public void setStroke(Stroke stroke) {
+		this.stroke = stroke;
+	}
+	
 	/** Met a jour les points formant la Shape2D */
 	public void setPoint(double[] xpoints, double[] ypoints, int npoints) {
 		this.points = new Point2D[npoints];
@@ -111,34 +107,6 @@ public class Shape2D {
 		this.npoints = npoints;
 	}
 	
-	/** Calcul et retourne la boundingBox */
-	public Rectangle2D.Double computeBoundingBox() {
-		double minX = Double.MAX_VALUE;
-		double minY = Double.MAX_VALUE;
-		double maxX = Double.MIN_VALUE;
-		double maxY = Double.MIN_VALUE;
-		for (int i = 0; i < npoints; i++) {
-			Point2D point = getPoint(i);
-			minX = Math.min(minX, point.getX());
-			minY = Math.min(minY, point.getY());
-			maxX = Math.max(maxX, point.getX());
-			maxY = Math.max(maxY, point.getY());
-		}
-		return new Rectangle2D.Double(minX, minY, maxX-minX, maxY-minY);
-	}
-	
-	/** Calcul et retourne l'air du polygone */
-	public double computeArea() {
-		double area = 0.0;
-		int j = getNPoint() - 1;
-		for (int i = 0; i < getNPoint(); i++) {
-			Point2D iPoint = points[i];
-			Point2D jPoint = points[j];
-			area += (jPoint.getX() + iPoint.getX()) * (jPoint.getY() - iPoint.getY());
-			j = i;
-		}
-		return Math.abs(area / 2.0);
-	}
 	
 	/** Ajoute une translation a la transformation */
 	public void translate(double dx, double dy) {

@@ -5,9 +5,9 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.Viewer2D.data.Camera;
-import com.Viewer2D.geometry.Rectangle;
-import com.Viewer2D.graphics.Viewer2D;
+import viewer2D.data.Camera;
+import viewer2D.geometry.Rectangle;
+import viewer2D.graphic.Viewer2D;
 
 public class MainWindow extends JFrame {
 	
@@ -19,7 +19,7 @@ public class MainWindow extends JFrame {
 	public MainWindow(Camera camera) {
 		super("World2D");
 		
-		viewer = new Viewer2D(camera, 640, 480);
+		viewer = new Viewer2D(640, 480);
 		
 		panneau = new JPanel(new BorderLayout());
 		panneau.setLayout(new BorderLayout());
@@ -35,8 +35,8 @@ public class MainWindow extends JFrame {
 	
 	public void addShape() {
 		Rectangle c = new Rectangle(4, 2);
-		c.rotate(Math.PI / 16);
+		//c.rotate(Math.PI / 16);
 		
-		viewer.addShape(c);
+		viewer.getModel().add(c);
 	}
 }

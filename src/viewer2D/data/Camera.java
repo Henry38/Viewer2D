@@ -1,4 +1,4 @@
-package com.Viewer2D.data;
+package viewer2D.data;
 
 import java.awt.geom.Rectangle2D;
 
@@ -40,7 +40,7 @@ public class Camera {
 		return distance;
 	}
 	
-	/** Retourne le rectangle observe */
+	/** Retourne le rectangle observe dans le repere camera */
 	public final Rectangle2D.Double getRectangle() {
 		return rect;
 	}

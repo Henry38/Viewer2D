@@ -1,4 +1,4 @@
-package com.Viewer2D.geometry;
+package viewer2D.geometry;
 
 public class Carre extends Rectangle {
 	
