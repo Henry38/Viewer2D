@@ -12,11 +12,11 @@ public class Application {
 	/** Lancement de l'application */
 	public static void main(String[] args) {
 		
-		final Camera camera = new Camera();
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				final Camera camera = new Camera();
 				final MainWindow fen = new MainWindow(camera);
 				fen.addKeyListener(new KeyListener() {
 					public void keyTyped(KeyEvent ev) {}

@@ -48,8 +48,7 @@ public class Controler extends Thread {
             ++frameCount;
             totalElapsedTime += (System.currentTimeMillis() - frameStart);
             if (totalElapsedTime > 1000) {
-                reportedFramerate = (long) ((double) frameCount
-                        / (double) totalElapsedTime * 1000.0);
+                reportedFramerate = (long) ((double) frameCount / (double) totalElapsedTime * 1000.0);
                 // show the framerate in the applet status window
                 System.out.println("fps: " + reportedFramerate);
                 // repaint();

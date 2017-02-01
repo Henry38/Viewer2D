@@ -105,7 +105,7 @@ public class Viewer2D extends JComponent {
 	}
 	
 	
-	/** Retourne l'unite e la grile */
+	/** Retourne l'unite de la grile */
 	public int getUnity() {
 		return unityGrid;
 	}
