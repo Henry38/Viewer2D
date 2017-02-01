@@ -5,8 +5,6 @@ import java.awt.event.KeyListener;
 
 import javax.swing.SwingUtilities;
 
-import viewer2D.data.Camera;
-
 public class Application {
 	
 	/** Lancement de l'application */
@@ -16,8 +14,7 @@ public class Application {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				final Camera camera = new Camera();
-				final MainWindow fen = new MainWindow(camera);
+				final MainWindow fen = new MainWindow();
 				fen.addKeyListener(new KeyListener() {
 					public void keyTyped(KeyEvent ev) {}
 					

@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import viewer2D.data.Camera;
 import viewer2D.data.WorldModel;
 import viewer2D.geometry.Rectangle;
 import viewer2D.graphic.Viewer2D;
@@ -17,7 +16,7 @@ public class MainWindow extends JFrame {
 	private Viewer2D viewer;
 	
 	/** Constructeur */
-	public MainWindow(Camera camera) {
+	public MainWindow() {
 		super("World2D");
 		
 		WorldModel world = new WorldModel();
