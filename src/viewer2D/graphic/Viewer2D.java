@@ -15,6 +15,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
 import javax.swing.JComponent;
 
+import viewer2D.controler.CameraListener;
 import viewer2D.controler.WorldModelListener;
 import viewer2D.data.Camera;
 import viewer2D.data.Viewport;
@@ -42,9 +43,6 @@ public class Viewer2D extends JComponent {
 	
 	private int unityGrid = 1;
 	private int eventButton = 0;
-	private boolean movable = true;
-	private boolean spinnable = true;
-	private boolean zoomable = true;
 	
 	/** Contructeur */
 	public Viewer2D(WorldModel model, int width, int height) {
@@ -63,6 +61,8 @@ public class Viewer2D extends JComponent {
 		this.addMouseMotionListener(getHandler());
 		this.addMouseWheelListener(getHandler());
 		this.addComponentListener(getHandler());
+		
+		this.camera.addCameraListener(getHandler());
 		
 		this.setPreferredSize(new Dimension(width, height));
 	}
@@ -105,24 +105,9 @@ public class Viewer2D extends JComponent {
 	}
 	
 	
-	/** Retourne l'unite de la grile */
+	/** Retourne l'unite de la grille */
 	public int getUnity() {
 		return unityGrid;
-	}
-	
-	/** Indique si la camera est translatable */
-	public boolean getMoveable() {
-		return movable;
-	}
-	
-	/** Indique si la camera est tournable */
-	public boolean getSpinnable() {
-		return spinnable;
-	}
-	
-	/** Indique si la camera peut zoomer */
-	public boolean getZoomable() {
-		return zoomable;
 	}
 	
 //	/** Ajoute une Shaped2D a afficher dans le viewer */
@@ -138,21 +123,6 @@ public class Viewer2D extends JComponent {
 	/** Met a jour l'unite de la grille */
 	public void setUnity(int value) {
 		unityGrid = Math.max(1, value);
-	}
-	
-	/** Permet la translation de la camera */
-	public void setMoveable(boolean value) {
-		this.movable = value;
-	}
-	
-	/** Permet la rotation de la camera */
-	public void setSpinnable(boolean value) {
-		this.spinnable = value;
-	}
-	
-	/** Permet le zoom de la camera */
-	public void setZoomable(boolean value) {
-		this.zoomable = value;
 	}
 	
 	public void drawPoint(Graphics g2, Point2D point) {
@@ -342,10 +312,10 @@ public class Viewer2D extends JComponent {
 	
 	
 	/** Classe qui ecoute le modele et les click utilisateur */
-	private class Handler extends MouseAdapter implements WorldModelListener, MouseMotionListener, MouseWheelListener, ComponentListener {
+	private class Handler extends MouseAdapter implements WorldModelListener, CameraListener, MouseMotionListener, MouseWheelListener, ComponentListener {
 
 		///
-		/// ComponentListener
+		/// WorldModelListener
 		///
 		@Override
 		public void shapeAdded(Shape2D shape) { }
@@ -362,22 +332,18 @@ public class Viewer2D extends JComponent {
 		/// MouseListener
 		///
 		@Override
+		public void cameraChanged() {
+			repaint();
+		}
+		
+		///
+		/// MouseListener
+		///
+		@Override
 		public void mousePressed(MouseEvent ev) {
 			columnClicked = ev.getX();
 			lineClicked = ev.getY();
 			eventButton = ev.getButton();
-			
-			if (eventButton == 1 && !getMoveable()) {
-				columnClicked = 0;
-				lineClicked = 0;
-				eventButton = 0;
-			}
-			
-			if (eventButton == 2 && !getSpinnable()) {
-				columnClicked = 0;
-				lineClicked = 0;
-				eventButton = 0;
-			}
 		}
 		
 		@Override
@@ -390,17 +356,21 @@ public class Viewer2D extends JComponent {
 		
 		@Override
 		public void mouseDragged(MouseEvent ev) {
+			if (camera == null) {
+				return;
+			}
+			
 			Rectangle2D.Double rect = camera.getRectangle();
 			double dx = ((double) (columnClicked - ev.getX()) / getWidth()) * rect.getWidth();
 			double dy = ((double) (lineClicked - ev.getY()) / getHeight()) * rect.getHeight();
 			
 			// Left click
-			if (eventButton == MouseEvent.BUTTON1) {
+			if (eventButton == MouseEvent.BUTTON1 && camera.getMoveable()) {
 				camera.addTranslation(dx, -dy);
 			}
 			
 			// Right click
-			if (eventButton == MouseEvent.BUTTON2) {
+			if (eventButton == MouseEvent.BUTTON2 && camera.getSpinnable()) {
 				Vecteur2D or = new Vecteur2D(columnClicked - getWidth() / 2, lineClicked - getHeight() / 2);
 				Vecteur2D op = new Vecteur2D(ev.getX() - getWidth() / 2, ev.getY() - getHeight() / 2);
 				if (or.getNorme() > 0 && op.getNorme() > 0) {
@@ -412,7 +382,6 @@ public class Viewer2D extends JComponent {
 				}
 			}
 			
-			repaint();
 			columnClicked = ev.getX();
 			lineClicked = ev.getY();
 		}
@@ -422,9 +391,12 @@ public class Viewer2D extends JComponent {
 		///
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent ev) {
-			if (getZoomable()) {
+			if (camera == null) {
+				return;
+			}
+			
+			if (camera.getZoomable()) {
 				camera.addZoom(-ev.getWheelRotation() * (camera.getZ() / 10.0));
-				repaint();
 			}
 		}
 		
@@ -445,6 +417,6 @@ public class Viewer2D extends JComponent {
 		}
 		
 		@Override
-		public void componentShown(ComponentEvent ev) {}		
+		public void componentShown(ComponentEvent ev) {}	
 	}
 }

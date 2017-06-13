@@ -10,7 +10,6 @@ public class Application {
 	/** Lancement de l'application */
 	public static void main(String[] args) {
 		
-		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

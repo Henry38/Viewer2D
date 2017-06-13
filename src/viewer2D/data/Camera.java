@@ -2,20 +2,35 @@ package viewer2D.data;
 
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.event.EventListenerList;
+
 import math2D.Transformation2D;
+import viewer2D.controler.CameraListener;
 
 public class Camera {
+	
+	private boolean movable;
+	private boolean spinnable;
+	private boolean zoomable;
 	
 	private Transformation2D viewMat, projMat;
 	private Rectangle2D.Double rect;
 	private double distance, fovy, ratio;
-	private double l, r, b, t;
+	private double left, right, bottom, top;
+	
+	protected EventListenerList listenerList;
 	
 	/** Constructeur */
 	public Camera(double x, double y) {
 		this.viewMat = new Transformation2D();
 		this.projMat = new Transformation2D();
 		this.rect = new Rectangle2D.Double();
+		this.movable = true;
+		this.spinnable = true;
+		this.zoomable = true;
+		
+		this.listenerList = new EventListenerList();
+		
 		addTranslation(x, y);
 		setFrustrum(5.0, Math.PI/4, 4.0/3.0);
 	}
@@ -23,6 +38,40 @@ public class Camera {
 	/** Constructeur */
 	public Camera() {
 		this(0, 0);
+	}
+
+	/** Ajoute un listener sur la camera */
+	public void addCameraListener(CameraListener l) {
+		listenerList.add(CameraListener.class, l);
+	}
+	
+	/** Retire un listener sur la camera */
+	public void removeCameraListener(CameraListener l) {
+		listenerList.remove(CameraListener.class, l);
+	}
+
+	protected void fireCameraChanged() {
+		Object[] listeners = listenerList.getListenerList();
+		for (int i = 0; i < listeners.length; i++) {
+			if (listeners[i] instanceof CameraListener) {
+				((CameraListener) listeners[i]).cameraChanged();
+			}
+		}
+	}
+	
+	/** Indique si la camera est translatable */
+	public boolean getMoveable() {
+		return movable;
+	}
+	
+	/** Indique si la camera est tournable */
+	public boolean getSpinnable() {
+		return spinnable;
+	}
+	
+	/** Indique si la camera peut zoomer */
+	public boolean getZoomable() {
+		return zoomable;
 	}
 	
 	/** Retourne la transformation camera */
@@ -45,14 +94,31 @@ public class Camera {
 		return rect;
 	}
 	
+	/** Permet la translation de la camera */
+	public void setMoveable(boolean value) {
+		this.movable = value;
+	}
+	
+	/** Permet la rotation de la camera */
+	public void setSpinnable(boolean value) {
+		this.spinnable = value;
+	}
+	
+	/** Permet le zoom de la camera */
+	public void setZoomable(boolean value) {
+		this.zoomable = value;
+	}
+	
 	/** Translate la camera */
 	public void addTranslation(double dx, double dy) {
 		viewMat.addTranslation(-dx, -dy);
+		fireCameraChanged();
 	}
 	
 	/** Pivote la camera */
 	public void addRotation(double radian) {
 		viewMat.addRotation(-radian);
+		fireCameraChanged();
 	}
 	
 	/** Change la hauteur de la camera */
@@ -70,21 +136,22 @@ public class Camera {
 		this.ratio = ratio;
 		double v = distance * Math.tan(fovy);
 		double u = ratio * v;
-		l = -u;
-		r = u;
-		b = -v;
-		t = v;
-		rect.setRect(l, b, r-l, t-b);
+		left = -u;
+		right = u;
+		bottom = -v;
+		top = v;
+		rect.setRect(left, bottom, right-left, top-bottom);
 		updateProjMatrix();
+		fireCameraChanged();
 	}
 	
 	private void updateProjMatrix() {
 		projMat.clear();
-		double dx = -(r+l)/(r-l);
-		double dy = -(t+b)/(t-b);
+		double dx = -(right+left)/(right-left);
+		double dy = -(top+bottom)/(top-bottom);
 		projMat.addTranslation(dx, dy);
-		double sx = 2.0/(r-l);
-		double sy = -2.0/(t-b);
+		double sx = 2.0/(right-left);
+		double sy = -2.0/(top-bottom);
 		projMat.addScale(sx, sy);
 		
 //		Matrix3D m = new Matrix3D(new double[][] {
