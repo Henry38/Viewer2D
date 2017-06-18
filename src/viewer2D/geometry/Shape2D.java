@@ -16,7 +16,8 @@ public class Shape2D {
 	
 	protected Color color;
 	protected Stroke stroke;
-	protected boolean wireframe;
+	protected boolean drawWireframe;	
+	protected boolean drawTransform;
 	
 	/** Constructeur */
 	public Shape2D(Point2D... points) {
@@ -27,6 +28,8 @@ public class Shape2D {
 		setOy(0);
 		setColor(defaultColor);
 		setStroke(null);
+		drawWireframe(false);
+		drawTransform(false);
 		calculateBarycenter();
 	}
 	
@@ -83,9 +86,14 @@ public class Shape2D {
 		return stroke;
 	}
 	
-	/** Retourne le mode de rendu de la Shape2D */
-	public boolean isWireframe() {
-		return wireframe;
+	/** Retourne vrai si la Shape2D doit etre rendu en wireframe */
+	public boolean drawWireframe() {
+		return drawWireframe;
+	}
+	
+	/** Retourne vrai si la transform doit etre dessine */
+	public boolean drawTransform() {
+		return drawTransform;
 	}
 	
 	/** Met a jour la coordonnee X de l'oigine */
@@ -109,8 +117,13 @@ public class Shape2D {
 	}
 	
 	/** Met a jour le mode de rendu */
-	public void setWireframe(boolean wireframe) {
-		this.wireframe = wireframe;
+	public void drawWireframe(boolean wireframe) {
+		this.drawWireframe = wireframe;
+	}
+	
+	/** Met a jour le rendu de la transform */
+	public void drawTransform(boolean transform) {
+		this.drawTransform = transform;
 	}
 	
 	/** Met a jour les points formant la Shape2D */

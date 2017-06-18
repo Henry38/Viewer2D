@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -35,7 +36,7 @@ public class Viewer2D extends JComponent {
 	private Camera camera;
 	private Viewport viewport;
 	private Handler handler;
-	private Transformation2D screenMVP;
+	protected Transformation2D screenMVP;
 	
 	protected BasicStroke gridStroke, axisStroke;
 	protected boolean drawAxis, drawGrid;
@@ -207,15 +208,16 @@ public class Viewer2D extends JComponent {
 			ypoints[i] = (int) proj_p.getY();
 		}
 		g2.setColor(shape.getColor());
-		if (shape.isWireframe()) {
+		if (shape.drawWireframe()) {
+			if (shape.getStroke() != null) {
+				g2.setStroke(shape.getStroke());
+			}
 			g2.drawPolygon(xpoints, ypoints, shape.getNbPoint());
 		} else {
 			g2.fillPolygon(xpoints, ypoints, shape.getNbPoint());
 		}
-		if (shape.getStroke() != null) {
-			g2.setColor(Color.black);
-			g2.setStroke(shape.getStroke());
-			g2.drawPolygon(xpoints, ypoints, shape.getNbPoint());
+		if (shape.drawTransform()) {
+			drawBase(g2, shape.getModel().toBase2D());
 		}
 	}
 	
@@ -320,6 +322,8 @@ public class Viewer2D extends JComponent {
 		Transformation2D viewProjScreen = Transformation2D.addTransformation(viewport.screenMat(), viewProj);
 		screenMVP = viewProjScreen;
 		
+		Stroke defaultStroke = g2.getStroke();
+		
 		// Affichage de la grille
 		if (drawGrid) {
 			drawGrid(g2);
@@ -330,10 +334,11 @@ public class Viewer2D extends JComponent {
 			drawAxis(g2);
 		}
 		
+		g2.setStroke(defaultStroke);
+		
 		// Affichage des formes
 		for (Shape2D shape : model.getListShape()) {
 			drawShape(g2, shape);
-			drawBase(g2, shape.getModel().toBase2D());
 		}
 		
 //		if (eventButton == 2) {
