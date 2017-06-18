@@ -7,6 +7,8 @@ import math2D.Transformation2D;
 
 public class Shape2D {
 	
+	private static Color defaultColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+	
 	protected Transformation2D transform;
 	protected Point2D[] points;
 	protected Point2D barycenter;
@@ -23,7 +25,7 @@ public class Shape2D {
 		setPoint(xpoints, ypoints, npoints);
 		setOx(0);
 		setOy(0);
-		setColor(Color.red);
+		setColor(defaultColor);
 		setStroke(null);
 	}
 	
