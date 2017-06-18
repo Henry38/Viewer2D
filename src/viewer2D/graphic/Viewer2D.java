@@ -90,6 +90,16 @@ public class Viewer2D extends JComponent {
 		return model;
 	}
 	
+	/** Retourne la camera */
+	public Camera getCamera() {
+		return camera;
+	}
+	
+	/** Retourne l'unite de la grille */
+	public int getUnity() {
+		return unityGrid;
+	}
+	
 	/** Retourne le handler sur le Viewer2D */
 	private Handler getHandler() {
 		return handler;
@@ -113,25 +123,26 @@ public class Viewer2D extends JComponent {
 	}
 	
 	
-	/** Retourne l'unite de la grille */
-	public int getUnity() {
-		return unityGrid;
 	}
 	
-//	/** Ajoute une Shaped2D a afficher dans le viewer */
-//	public void addShape(Shape2D shape) {
-//		listShape.add(shape);
-//	}
-//	
-//	/** Retire une Shaped2D du viewer */
-//	public void removeShape(Shape2D shape) {
-//		listShape.remove(shape);
-//	}
 	
 	/** Met a jour l'unite de la grille */
 	public void setUnity(int value) {
 		unityGrid = Math.max(1, value);
 	}
+	
+	
+	public Point2D mapToWorld(double x, double y) {
+		Transformation2D viewProj = Transformation2D.addTransformation(camera.projMat(), camera.viewMat());
+		Transformation2D viewProjScreen = Transformation2D.addTransformation(viewport.screenMat(), viewProj);
+		
+		Transformation2D inverse = viewProjScreen.getInverseTransformation();
+		
+		return inverse.transform(new Point2D(x, y));
+	public Point2D mapFromWorld(double x, double y) {
+		Transformation2D viewProj = Transformation2D.addTransformation(camera.projMat(), camera.viewMat());
+		Transformation2D viewProjScreen = Transformation2D.addTransformation(viewport.screenMat(), viewProj);
+		return viewProjScreen.transform(new Point2D(x, y));
 	
 	public void drawPoint(Graphics g2, Point2D point) {
 		Point2D proj_p = screenMVP.transform(point);
