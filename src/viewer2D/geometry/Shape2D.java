@@ -38,7 +38,7 @@ public class Shape2D {
 		return getModel().transform(p);
 	}
 	
-	/** Retourne le point n°index dans les coordonnees du monde */
+	/** Retourne le point d'indice index dans les coordonnees du monde */
 	public Point2D getPoint2D(int index) {
 		return getPoint2D(points[index]);
 	}

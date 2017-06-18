@@ -60,7 +60,7 @@ public class WorldModel {
 		return listShape;
 	}
 	
-	/** Retourne la Shape2D n°index */
+	/** Retourne la Shape2D a l'indice index */
 	public Shape2D getShape(int index) {
 		return listShape.get(index);
 	}
