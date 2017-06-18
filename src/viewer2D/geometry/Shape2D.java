@@ -15,6 +15,7 @@ public class Shape2D {
 	
 	protected Color color;
 	protected Stroke stroke;
+	protected boolean wireframe;
 	
 	/** Constructeur */
 	public Shape2D(double[] xpoints, double[] ypoints, int npoints) {
@@ -73,6 +74,11 @@ public class Shape2D {
 		return stroke;
 	}
 	
+	/** Retourne le mode de rendu de la Shape2D */
+	public boolean isWireframe() {
+		return wireframe;
+	}
+	
 	/** Met a jour la coordonnee X de l'oigine */
 	public void setOx(double ox) {
 		this.ox = ox;
@@ -91,6 +97,11 @@ public class Shape2D {
 	/** Met a jour la bordure */
 	public void setStroke(Stroke stroke) {
 		this.stroke = stroke;
+	}
+	
+	/** Met a jour le mode de rendu */
+	public void setWireframe(boolean wireframe) {
+		this.wireframe = wireframe;
 	}
 	
 	/** Met a jour les points formant la Shape2D */
