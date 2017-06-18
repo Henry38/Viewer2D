@@ -12,7 +12,6 @@ public class Shape2D {
 	protected Transformation2D transform;
 	protected Point2D[] points;
 	protected Point2D barycenter;
-	protected int npoints;
 	protected double ox, oy;
 	
 	protected Color color;
@@ -20,13 +19,21 @@ public class Shape2D {
 	protected boolean wireframe;
 	
 	/** Constructeur */
-	public Shape2D(double[] xpoints, double[] ypoints, int npoints) {
+	public Shape2D(Point2D... points) {
 		this.transform = new Transformation2D();
-		setPoint(xpoints, ypoints, npoints);
+		this.points = points;
+		this.barycenter = new Point2D();
 		setOx(0);
 		setOy(0);
 		setColor(defaultColor);
 		setStroke(null);
+		calculateBarycenter();
+	}
+	
+	/** Constructeur */
+	public Shape2D(double[] xpoints, double[] ypoints, int npoints) {
+		this(new Point2D[] {});
+		setPoint(xpoints, ypoints, npoints);
 	}
 	
 	/** Retourne la Transformation2D de la Shape2D */
@@ -34,7 +41,7 @@ public class Shape2D {
 		return transform;
 	}
 	
-	/** Retourne le Point2D monde du Point2D local exprime dans le repere local */
+	/** Retourne le Point2D dans les coordonnees du monde */
 	public Point2D getPoint2D(Point2D point) {
 		Point2D p = new Point2D(point);
 		p.translation(-getOx(), -getOy());
@@ -52,8 +59,8 @@ public class Shape2D {
 	}
 	
 	/** Retourne le nombre de points */
-	public int getNPoint() {
-		return npoints;
+	public int getNbPoint() {
+		return points.length;
 	}
 	
 	/** Retourne la coordonnee X de l'oigine */
@@ -109,15 +116,10 @@ public class Shape2D {
 	/** Met a jour les points formant la Shape2D */
 	public void setPoint(double[] xpoints, double[] ypoints, int npoints) {
 		this.points = new Point2D[npoints];
-		double bx = 0.0;
-		double by = 0.0;
 		for (int i = 0; i < npoints; i++) {
 			points[i] = new Point2D(xpoints[i], ypoints[i]);
-			bx += xpoints[i];
-			by += ypoints[i];
 		}
-		this.barycenter = new Point2D(bx / npoints, by / npoints);
-		this.npoints = npoints;
+		calculateBarycenter();
 	}
 	
 	
@@ -134,5 +136,17 @@ public class Shape2D {
 	/** Ajoute un changement d'echelle a la transformation */
 	public void scale(double sx, double sy) {
 		transform.addScale(sx, sy);
+	}
+	
+	/** Calcule le barycentre des Point2D */
+	private void calculateBarycenter() {
+		int npoints = getNbPoint();
+		double bx = 0.0;
+		double by = 0.0;
+		for (int i = 0; i < npoints; i++) {
+			bx += points[i].x;
+			by += points[i].y;
+		}
+		this.barycenter.set(bx / npoints, by / npoints);
 	}
 }
