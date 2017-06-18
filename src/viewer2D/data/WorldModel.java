@@ -81,4 +81,12 @@ public class WorldModel {
 		listShape.remove(shape);
 		fireShapeRemoved(shape);
 	}
+	
+	/** Retire toutes les shapes du monde */
+	public void removeAll() {
+		for (int i = getNbShape()-1; i >= 0; i--) {
+			Shape2D shape = getShape(i);
+			remove(shape);
+		}
+	}
 }
