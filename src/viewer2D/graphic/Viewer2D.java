@@ -44,6 +44,9 @@ public class Viewer2D extends JComponent {
 	private int unityGrid = 1;
 	private int eventButton = 0;
 	
+	protected Color backgroundColor = new Color(240, 240, 240, 255);
+	protected Color axisColor = new Color(0, 0, 0, 255);
+	
 	/** Contructeur */
 	public Viewer2D(WorldModel model, int width, int height) {
 		super();
@@ -285,7 +288,7 @@ public class Viewer2D extends JComponent {
 		super.paintComponent(g);
 		
 		Graphics2D g2 = (Graphics2D) g;
-		g2.setColor(Color.white);
+		g2.setColor(backgroundColor);
 		g2.fillRect(0, 0, getWidth(), getHeight());
 		
 		Transformation2D viewProj = Transformation2D.addTransformation(camera.projMat(), camera.viewMat());
