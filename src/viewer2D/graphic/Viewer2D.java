@@ -35,12 +35,13 @@ public class Viewer2D extends JComponent {
 	private Camera camera;
 	private Viewport viewport;
 	private Handler handler;
-	
-	private BasicStroke gridStroke, axisStroke;
 	private Transformation2D screenMVP;
+	
+	protected BasicStroke gridStroke, axisStroke;
+	protected boolean drawAxis, drawGrid;
+	
 	private int lineClicked = 0;
 	private int columnClicked = 0;
-	
 	private int unityGrid = 1;
 	private int eventButton = 0;
 	
@@ -54,11 +55,14 @@ public class Viewer2D extends JComponent {
 		this.camera = new Camera();
 		this.viewport = new Viewport(0, 0, width, height);
 		this.handler = new Handler();
-		
-		setModel(model);
+		this.screenMVP = null;
 		
 		this.gridStroke = new BasicStroke();
 		this.axisStroke = new BasicStroke(3.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL);
+		this.drawAxis = true;
+		this.drawGrid = true;
+		
+		setModel(model);
 		
 		this.addMouseListener(getHandler());
 		this.addMouseMotionListener(getHandler());
@@ -68,6 +72,7 @@ public class Viewer2D extends JComponent {
 		this.camera.addCameraListener(getHandler());
 		
 		this.setPreferredSize(new Dimension(width, height));
+		this.setSize(width, height);
 	}
 	
 	/** Contructeur */
@@ -77,7 +82,7 @@ public class Viewer2D extends JComponent {
 	
 	/** Contructeur */
 	public Viewer2D() {
-		this(640, 480);
+		this(0, 0);
 	}
 	
 	/** Retourne le modele */
