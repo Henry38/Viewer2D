@@ -182,19 +182,23 @@ public class Viewer2D extends JComponent {
 	}
 	
 	public void drawShape(Graphics2D g2, Shape2D shape) {
-		int[] xpoints = new int[shape.getNPoint()];
-		int[] ypoints = new int[shape.getNPoint()];
-		for (int i = 0; i < shape.getNPoint(); i++) {
+		int[] xpoints = new int[shape.getNbPoint()];
+		int[] ypoints = new int[shape.getNbPoint()];
+		for (int i = 0; i < shape.getNbPoint(); i++) {
 			Point2D proj_p = screenMVP.transform(shape.getPoint2D(i));
 			xpoints[i] = (int) proj_p.getX();
 			ypoints[i] = (int) proj_p.getY();
 		}
 		g2.setColor(shape.getColor());
-		g2.fillPolygon(xpoints, ypoints, shape.getNPoint());
+		if (shape.isWireframe()) {
+			g2.drawPolygon(xpoints, ypoints, shape.getNbPoint());
+		} else {
+			g2.fillPolygon(xpoints, ypoints, shape.getNbPoint());
+		}
 		if (shape.getStroke() != null) {
 			g2.setColor(Color.black);
 			g2.setStroke(shape.getStroke());
-			g2.drawPolygon(xpoints, ypoints, shape.getNPoint());
+			g2.drawPolygon(xpoints, ypoints, shape.getNbPoint());
 		}
 	}
 	
@@ -224,19 +228,18 @@ public class Viewer2D extends JComponent {
 		int minY = Integer.MAX_VALUE;
 		int maxX = Integer.MIN_VALUE;
 		int maxY = Integer.MIN_VALUE;
-		//double step = 1;//(bottomRight.getX() - bottomLeft.getX()) / 10;
 		for (Point2D point : new Point2D[] { bottomLeft, bottomRight, topRight, topLeft }) {
-			if (point.getX() < minX) {
-				minX = (int) (Math.floor(point.getX() / step) * step);
+			if (point.x < minX) {
+				minX = (int) (Math.floor(point.x / step) * step);
 			}
-			if (point.getX() > maxX) {
-				maxX = (int) ((Math.floor(point.getX() / step) + 1) * step);
+			if (point.x > maxX) {
+				maxX = (int) ((Math.floor(point.x / step) + 1) * step);
 			}
-			if (point.getY() < minY) {
-				minY = (int) (Math.floor(point.getY() / step) * step);
+			if (point.y < minY) {
+				minY = (int) (Math.floor(point.y / step) * step);
 			}
-			if (point.getY() > maxY) {
-				maxY = (int) ((Math.floor(point.getY() / step) + 1) * step);
+			if (point.y > maxY) {
+				maxY = (int) ((Math.floor(point.y / step) + 1) * step);
 			}
 		}
 		
@@ -302,15 +305,13 @@ public class Viewer2D extends JComponent {
 		for (Shape2D shape : model.getListShape()) {
 			drawShape(g2, shape);
 			drawBase(g2, shape.getModel().toBase2D());
-//			g2.setColor(Color.black);
-//			drawPoint(g2, shape.getBarycenter());
 		}
 		
-		if (eventButton == 2) {
-			g2.setColor(Color.darkGray);
-			g2.setStroke(gridStroke);
-			g2.drawLine(getWidth() / 2, getHeight() / 2, columnClicked, lineClicked);
-		}
+//		if (eventButton == 2) {
+//			g2.setColor(Color.darkGray);
+//			g2.setStroke(gridStroke);
+//			g2.drawLine(getWidth() / 2, getHeight() / 2, columnClicked, lineClicked);
+//		}
 	}
 	
 	
@@ -351,9 +352,6 @@ public class Viewer2D extends JComponent {
 		
 		@Override
 		public void mouseReleased(MouseEvent ev) {
-			if (eventButton == 2) {
-				repaint();
-			}
 			eventButton = 0;
 		}
 		
