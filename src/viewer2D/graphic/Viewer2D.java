@@ -122,10 +122,6 @@ public class Viewer2D extends JComponent {
 		firePropertyChange(MODEL_CHANGED_PROPERTY, oldModel, model);
 	}
 	
-	
-	}
-	
-	
 	/** Met a jour l'unite de la grille */
 	public void setUnity(int value) {
 		unityGrid = Math.max(1, value);
@@ -139,10 +135,15 @@ public class Viewer2D extends JComponent {
 		Transformation2D inverse = viewProjScreen.getInverseTransformation();
 		
 		return inverse.transform(new Point2D(x, y));
+	}
+	
 	public Point2D mapFromWorld(double x, double y) {
 		Transformation2D viewProj = Transformation2D.addTransformation(camera.projMat(), camera.viewMat());
 		Transformation2D viewProjScreen = Transformation2D.addTransformation(viewport.screenMat(), viewProj);
+		
 		return viewProjScreen.transform(new Point2D(x, y));
+	}
+	
 	
 	public void drawPoint(Graphics g2, Point2D point) {
 		Point2D proj_p = screenMVP.transform(point);
@@ -218,6 +219,23 @@ public class Viewer2D extends JComponent {
 		}
 	}
 	
+	public void drawAxis(Graphics2D g2) {
+		Point2D point1 = new Point2D();
+		Point2D point2 = new Point2D();
+		
+		// Affichage du repere canonique
+		point1.setX(0);
+		point1.setY(0);
+		g2.setColor(axisColor);
+		g2.setStroke(axisStroke);
+		point2.setX(1);
+		point2.setY(0);
+		drawArrow(g2, point1, point2);
+		point2.setX(0);
+		point2.setY(1);
+		drawArrow(g2, point1, point2);
+	}
+
 	public void drawGrid(Graphics2D g2) {
 		Point2D point1 = new Point2D();
 		Point2D point2 = new Point2D();
@@ -288,18 +306,6 @@ public class Viewer2D extends JComponent {
 			}
 			drawLine(g2, point1, point2);
 		}
-		
-		// Affichage du repere canonique
-		point1.setX(0);
-		point1.setY(0);
-		g2.setColor(Color.red);
-		g2.setStroke(axisStroke);
-		point2.setX(1);
-		point2.setY(0);
-		drawArrow(g2, point1, point2);
-		point2.setX(0);
-		point2.setY(1);
-		drawArrow(g2, point1, point2);
 	}
 	
 	@Override
@@ -315,7 +321,14 @@ public class Viewer2D extends JComponent {
 		screenMVP = viewProjScreen;
 		
 		// Affichage de la grille
-		drawGrid(g2);
+		if (drawGrid) {
+			drawGrid(g2);
+		}
+		
+		// Affichage des axes
+		if (drawAxis) {
+			drawAxis(g2);
+		}
 		
 		// Affichage des formes
 		for (Shape2D shape : model.getListShape()) {
@@ -333,7 +346,7 @@ public class Viewer2D extends JComponent {
 	
 	/** Classe qui ecoute le modele et les click utilisateur */
 	private class Handler extends MouseAdapter implements WorldModelListener, CameraListener, MouseMotionListener, MouseWheelListener, ComponentListener {
-
+		
 		///
 		/// WorldModelListener
 		///
