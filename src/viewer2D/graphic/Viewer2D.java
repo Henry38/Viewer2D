@@ -167,24 +167,21 @@ public class Viewer2D extends JComponent {
 		double dy = (0.10 * (point1.getY() - point2.getY()));
 		
 		Point2D dot = new Point2D();
-		dot.setX(dx);
-		dot.setY(dy);
-		dot.rotation(Math.PI / 8);
-		dot.translation(point2.getX(), point2.getY());
+		dot.set(dx, dy);
+		dot = dot.rotation(Math.PI / 8);
+		dot = dot.translation(point2.getX(), point2.getY());
 		proj_p = screenMVP.transform(dot);
 		g2.drawLine((int) proj_p2.getX(), (int) proj_p2.getY(), (int) proj_p.getX(), (int) proj_p.getY());
 		
-		dot.setX(dx);
-		dot.setY(dy);
-		dot.rotation(-Math.PI / 8);
-		dot.translation(point2.getX(), point2.getY());
+		dot.set(dx, dy);
+		dot = dot.rotation(-Math.PI / 8);
+		dot = dot.translation(point2.getX(), point2.getY());
 		proj_p = screenMVP.transform(dot);
 		g2.drawLine((int) proj_p2.getX(), (int) proj_p2.getY(), (int) proj_p.getX(), (int) proj_p.getY());
 	}
 	
 	public void drawArrow(Graphics g2, Point2D point, Vecteur2D vect) {
-		Point2D p = new Point2D(point);
-		p.translation(vect);
+		Point2D p = point.translation(vect);
 		drawArrow(g2, point, p);
 	}
 	
@@ -408,9 +405,9 @@ public class Viewer2D extends JComponent {
 			if (eventButton == MouseEvent.BUTTON2 && camera.getSpinnable()) {
 				Vecteur2D or = new Vecteur2D(columnClicked - getWidth() / 2, lineClicked - getHeight() / 2);
 				Vecteur2D op = new Vecteur2D(ev.getX() - getWidth() / 2, ev.getY() - getHeight() / 2);
-				if (or.getNorme() > 0 && op.getNorme() > 0) {
-					or.normalized();
-					op.normalized();
+				if (or.getNorm() > 0 && op.getNorm() > 0) {
+					or.normalize();
+					op.normalize();
 					double radianOR = Math.atan2(or.getDy(), or.getDx());
 					double radianOP = Math.atan2(op.getDy(), op.getDx());
 					camera.addRotation(radianOP - radianOR);

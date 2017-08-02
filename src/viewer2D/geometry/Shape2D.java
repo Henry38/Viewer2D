@@ -47,8 +47,8 @@ public class Shape2D {
 	/** Retourne le Point2D dans les coordonnees du monde */
 	public Point2D getPoint2D(Point2D point) {
 		Point2D p = new Point2D(point);
-		p.translation(-getOx(), -getOy());
-		return getModel().transform(p);
+		Point2D pt = p.translation(-getOx(), -getOy());
+		return getModel().transform(pt);
 	}
 	
 	/** Retourne le point d'indice index dans les coordonnees du monde */
