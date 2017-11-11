@@ -190,9 +190,9 @@ public class Viewer2D extends JComponent {
 		Point2D o = base.getOrigin();
 		Vecteur2D ox = base.getOx();
 		Vecteur2D oy = base.getOy();
-		g2.setColor(Color.green);
+		g2.setColor(Color.red);
 		drawArrow(g2, o, ox);
-		g2.setColor(Color.blue);
+		g2.setColor(Color.green);
 		drawArrow(g2, o, oy);
 	}
 	
@@ -449,6 +449,6 @@ public class Viewer2D extends JComponent {
 		}
 		
 		@Override
-		public void componentShown(ComponentEvent ev) {}	
+		public void componentShown(ComponentEvent ev) {}
 	}
 }
