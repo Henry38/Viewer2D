@@ -130,8 +130,8 @@ public class Viewer2D extends JComponent {
 	
 	
 	public Point2D mapToWorld(double x, double y) {
-		Transformation2D viewProj = Transformation2D.addTransformation(camera.projMat(), camera.viewMat());
-		Transformation2D viewProjScreen = Transformation2D.addTransformation(viewport.screenMat(), viewProj);
+		Transformation2D viewProj = Transformation2D.compose(camera.projMat(), camera.viewMat());
+		Transformation2D viewProjScreen = Transformation2D.compose(viewport.screenMat(), viewProj);
 		
 		Transformation2D inverse = viewProjScreen.getInverseTransformation();
 		
@@ -139,8 +139,8 @@ public class Viewer2D extends JComponent {
 	}
 	
 	public Point2D mapFromWorld(double x, double y) {
-		Transformation2D viewProj = Transformation2D.addTransformation(camera.projMat(), camera.viewMat());
-		Transformation2D viewProjScreen = Transformation2D.addTransformation(viewport.screenMat(), viewProj);
+		Transformation2D viewProj = Transformation2D.compose(camera.projMat(), camera.viewMat());
+		Transformation2D viewProjScreen = Transformation2D.compose(viewport.screenMat(), viewProj);
 		
 		return viewProjScreen.transform(new Point2D(x, y));
 	}
@@ -187,7 +187,7 @@ public class Viewer2D extends JComponent {
 	
 	public void drawBase(Graphics2D g2, Base2D base) {
 		g2.setStroke(axisStroke);
-		Point2D o = base.getOrigine();
+		Point2D o = base.getOrigin();
 		Vecteur2D ox = base.getOx();
 		Vecteur2D oy = base.getOy();
 		g2.setColor(Color.green);
@@ -315,8 +315,8 @@ public class Viewer2D extends JComponent {
 		g2.setColor(backgroundColor);
 		g2.fillRect(0, 0, getWidth(), getHeight());
 		
-		Transformation2D viewProj = Transformation2D.addTransformation(camera.projMat(), camera.viewMat());
-		Transformation2D viewProjScreen = Transformation2D.addTransformation(viewport.screenMat(), viewProj);
+		Transformation2D viewProj = Transformation2D.compose(camera.projMat(), camera.viewMat());
+		Transformation2D viewProjScreen = Transformation2D.compose(viewport.screenMat(), viewProj);
 		screenMVP = viewProjScreen;
 		
 		Stroke defaultStroke = g2.getStroke();
