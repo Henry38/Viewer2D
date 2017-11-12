@@ -364,7 +364,7 @@ public class Viewer2D extends JComponent {
 		}
 		
 		///
-		/// MouseListener
+		/// CameraListener
 		///
 		@Override
 		public void cameraChanged() {
