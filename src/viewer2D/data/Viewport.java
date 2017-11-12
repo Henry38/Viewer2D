@@ -57,7 +57,7 @@ public class Viewport {
 	}
 	
 	/** Retourne la screenMat */
-	public final Transformation2D screenMat() {
+	public Transformation2D screenMat() {
 		screenMat.clear();
 		double dx = x + (width / 2.0);
 		double dy = y + (height / 2.0);

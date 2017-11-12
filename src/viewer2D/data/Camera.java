@@ -49,7 +49,7 @@ public class Camera {
 	public void removeCameraListener(CameraListener l) {
 		listenerList.remove(CameraListener.class, l);
 	}
-
+	
 	protected void fireCameraChanged() {
 		Object[] listeners = listenerList.getListenerList();
 		for (int i = 0; i < listeners.length; i++) {
@@ -75,12 +75,12 @@ public class Camera {
 	}
 	
 	/** Retourne la transformation camera */
-	public final Transformation2D viewMat() {
+	public Transformation2D viewMat() {
 		return viewMat;
 	}
 	
 	/** Retourne la transformation de projection */
-	public final Transformation2D projMat() {
+	public Transformation2D projMat() {
 		return projMat;
 	}
 	
@@ -90,7 +90,7 @@ public class Camera {
 	}
 	
 	/** Retourne le rectangle observe dans le repere camera */
-	public final Rectangle2D.Double getRectangle() {
+	public Rectangle2D.Double getRectangle() {
 		return rect;
 	}
 	
