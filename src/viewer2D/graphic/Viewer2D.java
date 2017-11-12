@@ -284,19 +284,20 @@ public class Viewer2D extends JComponent {
 		Point2D point1 = new Point2D();
 		Point2D point2 = new Point2D();
 		
-		// Calcul des quatres points du rectangle (repere camera)
 		Rectangle2D.Double rect = camera.getRectangle();
-		Point2D bottomLeft = new Point2D(rect.getX(), rect.getY());
-		Point2D bottomRight = new Point2D(rect.getX() + rect.getWidth(), rect.getY());
-		Point2D topRight = new Point2D(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
-		Point2D topLeft = new Point2D(rect.getX(), rect.getY() + rect.getHeight());
+		
+		double left = rect.getMinX();
+		double bottom = rect.getMinY();
+		double right = rect.getMaxX();
+		double top = rect.getMaxY();
+		
+		Transformation2D inverseView = camera.viewMat().getInverseTransformation();
 		
 		// Calcul des quatres points du rectangle (repere monde)
-		Transformation2D inverseView = camera.viewMat().getInverseTransformation();
-		bottomLeft = inverseView.transform(bottomLeft);
-		bottomRight = inverseView.transform(bottomRight);
-		topRight = inverseView.transform(topRight);
-		topLeft = inverseView.transform(topLeft);
+		Point2D bottomLeft = inverseView.transform(new Point2D(left, bottom));
+		Point2D bottomRight = inverseView.transform(new Point2D(right, bottom));
+		Point2D topLeft = inverseView.transform(new Point2D(left, top));
+		Point2D topRight = inverseView.transform(new Point2D(right, top));
 		
 		// Unite de la grille
 		double step = getUnity();
