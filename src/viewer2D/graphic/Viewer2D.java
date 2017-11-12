@@ -41,8 +41,8 @@ public class Viewer2D extends JComponent {
 	protected BasicStroke gridStroke, axisStroke;
 	protected boolean drawAxis, drawGrid;
 	
-	private int lineClicked = 0;
-	private int columnClicked = 0;
+	private int yClicked = 0;
+	private int xClicked = 0;
 	private int unityGrid = 1;
 	private int eventButton = 0;
 	
@@ -341,7 +341,7 @@ public class Viewer2D extends JComponent {
 //		if (eventButton == 2) {
 //			g2.setColor(Color.darkGray);
 //			g2.setStroke(gridStroke);
-//			g2.drawLine(getWidth() / 2, getHeight() / 2, columnClicked, lineClicked);
+//			g2.drawLine(getWidth() / 2, getHeight() / 2, xClicked, yClicked);
 //		}
 	}
 	
@@ -376,8 +376,8 @@ public class Viewer2D extends JComponent {
 		///
 		@Override
 		public void mousePressed(MouseEvent ev) {
-			columnClicked = ev.getX();
-			lineClicked = ev.getY();
+			xClicked = ev.getX();
+			yClicked = ev.getY();
 			eventButton = ev.getButton();
 		}
 		
@@ -393,8 +393,8 @@ public class Viewer2D extends JComponent {
 			}
 			
 			Rectangle2D.Double rect = camera.getRectangle();
-			double dx = ((double) (columnClicked - ev.getX()) / getWidth()) * rect.getWidth();
-			double dy = ((double) (lineClicked - ev.getY()) / getHeight()) * rect.getHeight();
+			double dx = ((double) (xClicked - ev.getX()) / getWidth()) * rect.getWidth();
+			double dy = ((double) (yClicked - ev.getY()) / getHeight()) * rect.getHeight();
 			
 			// Left click
 			if (eventButton == MouseEvent.BUTTON1 && camera.getMoveable()) {
@@ -403,19 +403,17 @@ public class Viewer2D extends JComponent {
 			
 			// Right click
 			if (eventButton == MouseEvent.BUTTON2 && camera.getSpinnable()) {
-				Vecteur2D or = new Vecteur2D(columnClicked - getWidth() / 2, lineClicked - getHeight() / 2);
-				Vecteur2D op = new Vecteur2D(ev.getX() - getWidth() / 2, ev.getY() - getHeight() / 2);
-				if (or.getNorm() > 0 && op.getNorm() > 0) {
-					or.normalize();
-					op.normalize();
-					double radianOR = Math.atan2(or.getDy(), or.getDx());
-					double radianOP = Math.atan2(op.getDy(), op.getDx());
-					camera.addRotation(radianOP - radianOR);
+				Vecteur2D u = new Vecteur2D(xClicked - getWidth() / 2, yClicked - getHeight() / 2);
+				Vecteur2D v = new Vecteur2D(ev.getX() - getWidth() / 2, ev.getY() - getHeight() / 2);
+				if (u.getNorm() > 0 && v.getNorm() > 0) {
+					double uRadian = Math.atan2(u.getDy(), u.getDx());
+					double vRadian = Math.atan2(v.getDy(), v.getDx());
+					camera.addRotation(vRadian - uRadian);
 				}
 			}
 			
-			columnClicked = ev.getX();
-			lineClicked = ev.getY();
+			xClicked = ev.getX();
+			yClicked = ev.getY();
 		}
 		
 		///
