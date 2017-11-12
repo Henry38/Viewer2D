@@ -14,6 +14,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+
 import javax.swing.JComponent;
 
 import viewer2D.controler.CameraListener;
@@ -38,6 +40,8 @@ public class Viewer2D extends JComponent {
 	private Handler handler;
 	protected Transformation2D screenMVP;
 	
+	private ArrayList<Camera> externCamera;
+	
 	protected BasicStroke gridStroke, axisStroke;
 	protected boolean drawAxis, drawGrid;
 	
@@ -57,6 +61,8 @@ public class Viewer2D extends JComponent {
 		this.viewport = new Viewport(0, 0, width, height);
 		this.handler = new Handler();
 		this.screenMVP = null;
+		
+		this.externCamera = new ArrayList<Camera>();
 		
 		this.gridStroke = new BasicStroke();
 		this.axisStroke = new BasicStroke(3.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL);
@@ -128,6 +134,19 @@ public class Viewer2D extends JComponent {
 		unityGrid = Math.max(1, value);
 	}
 	
+	public void addExternCamera(Camera camera) {
+		if (!externCamera.contains(camera) && camera != getCamera()) {
+			externCamera.add(camera);
+			camera.addCameraListener(getHandler());
+		}
+	}
+	
+	public void removeExternCamera(Camera camera) {
+		if (externCamera.contains(camera)) {
+			externCamera.remove(camera);
+			camera.removeCameraListener(getHandler());
+		}
+	}
 	
 	public Point2D mapToWorld(double x, double y) {
 		Transformation2D viewProj = Transformation2D.compose(camera.projMat(), camera.viewMat());
@@ -216,6 +235,32 @@ public class Viewer2D extends JComponent {
 		if (shape.drawTransform()) {
 			drawBase(g2, shape.getModel().toBase2D());
 		}
+	}
+	
+	public void drawExternalCamera(Graphics2D g2, Camera camera) {
+		Transformation2D inverseView = camera.viewMat().getInverseTransformation();
+		Rectangle2D.Double rect = camera.getRectangle();
+		
+		drawBase(g2, inverseView.toBase2D());
+		
+		double left = rect.getMinX();
+		double bottom = rect.getMinY();
+		double right = rect.getMaxX();
+		double top = rect.getMaxY();
+		
+		// Calcul des quatres points du rectangle (repere monde)
+		Point2D bottomLeft = inverseView.transform(new Point2D(left, bottom));
+		Point2D bottomRight = inverseView.transform(new Point2D(right, bottom));
+		Point2D topLeft = inverseView.transform(new Point2D(left, top));
+		Point2D topRight = inverseView.transform(new Point2D(right, top));
+		
+		g2.setColor(Color.darkGray);
+		g2.setStroke(gridStroke);
+		
+		drawLine(g2, bottomLeft, bottomRight);
+		drawLine(g2, bottomRight, topRight);
+		drawLine(g2, topRight, topLeft);
+		drawLine(g2, topLeft, bottomLeft);
 	}
 	
 	public void drawAxis(Graphics2D g2) {
@@ -338,6 +383,11 @@ public class Viewer2D extends JComponent {
 			drawShape(g2, shape);
 		}
 		
+		// Affichage des cameras externes
+		for (Camera camera : externCamera) {
+			drawExternalCamera(g2, camera);
+		}
+				
 //		if (eventButton == 2) {
 //			g2.setColor(Color.darkGray);
 //			g2.setStroke(gridStroke);
