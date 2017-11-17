@@ -4,7 +4,9 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.event.EventListenerList;
 
+import math2D.Point2D;
 import math2D.Transformation2D;
+import math2D.Vecteur2D;
 import viewer2D.controler.CameraListener;
 
 public class Camera {
@@ -107,6 +109,36 @@ public class Camera {
 	/** Permet le zoom de la camera */
 	public void setZoomable(boolean value) {
 		this.zoomable = value;
+	}
+	
+	/** Regarde le point du monde (x,y) */
+	public void lookAt(double x, double y) {
+		Point2D p = viewMat.transform(0, 0);
+		viewMat.addTranslation(p.getX(), p.getY());
+		p = viewMat.transform(x, y);
+		viewMat.addTranslation(-p.getX(), -p.getY());
+		fireCameraChanged();
+	}
+	
+	/** Regarde le point du monde p */
+	public void lookAt(Point2D p) {
+		lookAt(p.getX(), p.getY());
+	}
+	
+	/** Definit le vecteur up de la camera */
+	public void lookTowards(double dx, double dy) {
+		double radian = Math.atan2(-dx, dy);
+		Point2D p = viewMat.getInverseTransformation().transform(0, 0);
+		viewMat.clear();
+		viewMat.addRotation(-radian);
+		p = viewMat.transform(p);
+		viewMat.addTranslation(-p.getX(), -p.getY());
+		fireCameraChanged();
+	}
+	
+	/** Defenit le vecteur up de la camera */
+	public void lookTowards(Vecteur2D vect) {
+		lookTowards(vect.getDx(), vect.getDy());
 	}
 	
 	/** Translate la camera */

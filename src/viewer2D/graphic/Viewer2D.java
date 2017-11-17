@@ -279,7 +279,7 @@ public class Viewer2D extends JComponent {
 		point2.setY(1);
 		drawArrow(g2, point1, point2);
 	}
-
+	
 	public void drawGrid(Graphics2D g2) {
 		Point2D point1 = new Point2D();
 		Point2D point2 = new Point2D();
@@ -388,7 +388,7 @@ public class Viewer2D extends JComponent {
 		for (Camera camera : externCamera) {
 			drawExternalCamera(g2, camera);
 		}
-				
+		
 //		if (eventButton == 2) {
 //			g2.setColor(Color.darkGray);
 //			g2.setStroke(gridStroke);
@@ -434,6 +434,23 @@ public class Viewer2D extends JComponent {
 		
 		@Override
 		public void mouseReleased(MouseEvent ev) {
+			if (eventButton == MouseEvent.BUTTON1 && camera.getSpinnable() && ev.getClickCount() == 2) {
+				Point2D p1 = mapToWorld(getWidth()/2, getHeight()/2);
+				Point2D p2 = mapToWorld(getWidth()/2, 0);
+				Vecteur2D up = new Vecteur2D(p1, p2);
+				up.normalize();
+				double xs = Vecteur2D.scalar_product(new Vecteur2D(1,0), up);
+				double ys = Vecteur2D.scalar_product(new Vecteur2D(0,1), up);
+				double dx, dy;
+				if (Math.abs(xs) > Math.abs(ys)) {
+					dx = (xs > 0 ? 1 : -1);
+					dy = 0;
+				} else {
+					dx = 0;
+					dy = (ys > 0 ? 1 : -1);
+				}
+				camera.lookTowards(dx, dy);
+			}
 			eventButton = 0;
 		}
 		
