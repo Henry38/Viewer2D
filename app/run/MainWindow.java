@@ -1,9 +1,11 @@
 package run;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import viewer2D.data.WorldModel;
 import viewer2D.geometry.Rectangle;
@@ -13,7 +15,7 @@ public class MainWindow extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	private JPanel panneau;
-	private Viewer2D viewer;
+	private Viewer2D viewer, viewer2;
 	
 	/** Constructeur */
 	public MainWindow() {
@@ -22,13 +24,20 @@ public class MainWindow extends JFrame {
 		WorldModel world = new WorldModel();
 		
 		Rectangle rectangle = new Rectangle(4, 2);
+		rectangle.drawTransform(true);
+		rectangle.setColor(Color.yellow);
 		world.add(rectangle);
 		
 		viewer = new Viewer2D(world, 640, 480);
+		viewer2 = new Viewer2D(world, 640, 480);
+		
+		viewer.addExternCamera(viewer2.getCamera());
+		
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewer, viewer2);
 		
 		panneau = new JPanel(new BorderLayout());
 		panneau.setLayout(new BorderLayout());
-		panneau.add(viewer, BorderLayout.CENTER);
+		panneau.add(splitPane, BorderLayout.CENTER);
 		
 		setContentPane(panneau);
 		
