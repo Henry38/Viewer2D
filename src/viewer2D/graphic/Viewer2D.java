@@ -23,7 +23,6 @@ import viewer2D.controler.WorldModelListener;
 import viewer2D.data.Camera;
 import viewer2D.data.Viewport;
 import viewer2D.data.WorldModel;
-import viewer2D.geometry.Shape2D;
 import math2D.Base2D;
 import math2D.Transformation2D;
 import math2D.Point2D;
@@ -215,28 +214,6 @@ public class Viewer2D extends JComponent {
 		drawArrow(g2, o, oy);
 	}
 	
-	public void drawShape(Graphics2D g2, Shape2D shape) {
-		int[] xpoints = new int[shape.getNbPoint()];
-		int[] ypoints = new int[shape.getNbPoint()];
-		for (int i = 0; i < shape.getNbPoint(); i++) {
-			Point2D proj_p = screenMVP.transform(shape.getPoint2D(i));
-			xpoints[i] = (int) proj_p.getX();
-			ypoints[i] = (int) proj_p.getY();
-		}
-		g2.setColor(shape.getColor());
-		if (shape.drawWireframe()) {
-			if (shape.getStroke() != null) {
-				g2.setStroke(shape.getStroke());
-			}
-			g2.drawPolygon(xpoints, ypoints, shape.getNbPoint());
-		} else {
-			g2.fillPolygon(xpoints, ypoints, shape.getNbPoint());
-		}
-		if (shape.drawTransform()) {
-			drawBase(g2, shape.getModel().toBase2D());
-		}
-	}
-	
 	public void drawExternalCamera(Graphics2D g2, Camera camera) {
 		Transformation2D inverseView = camera.viewMat().getInverseTransformation();
 		Rectangle2D.Double rect = camera.getRectangle();
@@ -379,9 +356,9 @@ public class Viewer2D extends JComponent {
 		
 		g2.setStroke(defaultStroke);
 		
-		// Affichage des formes
-		for (Shape2D shape : model.getListShape()) {
-			drawShape(g2, shape);
+		if (getModel() != null) {
+			for (Drawable drawable : getModel().getListDrawable()) {
+				drawable.draw(g2, screenMVP);
 		}
 		
 		// Affichage des cameras externes
@@ -404,10 +381,10 @@ public class Viewer2D extends JComponent {
 		/// WorldModelListener
 		///
 		@Override
-		public void shapeAdded(Shape2D shape) { }
+		public void drawableAdded(Drawable drawable) { }
 
 		@Override
-		public void shapeRemoved(Shape2D shape) { }
+		public void drawableRemoved(Drawable drawable) { }
 
 		@Override
 		public void needRefresh() {

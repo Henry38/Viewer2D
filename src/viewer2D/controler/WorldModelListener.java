@@ -2,10 +2,10 @@ package viewer2D.controler;
 
 import java.util.EventListener;
 
-import viewer2D.geometry.Shape2D;
+import viewer2D.graphic.Drawable;
 
 public interface WorldModelListener extends EventListener {
-	public void shapeAdded(Shape2D shape);
-	public void shapeRemoved(Shape2D shape);
+	public void drawableAdded(Drawable drawable);
+	public void drawableRemoved(Drawable drawable);
 	public void needRefresh();
 }

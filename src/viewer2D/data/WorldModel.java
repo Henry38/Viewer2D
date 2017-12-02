@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import javax.swing.event.EventListenerList;
 
 import viewer2D.controler.WorldModelListener;
-import viewer2D.geometry.Shape2D;
+import viewer2D.graphic.Drawable;
 
 public class WorldModel {
 	
-	protected ArrayList<Shape2D> listShape;
+	protected ArrayList<Drawable> listDrawable;
 	protected EventListenerList listenerList;
 	
 	/** Constructeur */
 	public WorldModel() {
-		this.listShape = new ArrayList<Shape2D>();
+		this.listDrawable = new ArrayList<Drawable>();
 		this.listenerList = new EventListenerList();
 	}
 	
@@ -28,20 +28,20 @@ public class WorldModel {
 		listenerList.remove(WorldModelListener.class, l);
 	}
 	
-	protected void fireShapeAdded(Shape2D shape) {
+	protected void fireDrawableAdded(Drawable drawable) {
 		Object[] listeners = listenerList.getListenerList();
 		for (int i = 0; i < listeners.length; i++) {
 			if (listeners[i] instanceof WorldModelListener) {
-				((WorldModelListener) listeners[i]).shapeAdded(shape);
+				((WorldModelListener) listeners[i]).drawableAdded(drawable);
 			}
 		}
 	}
 	
-	protected void fireShapeRemoved(Shape2D shape) {
+	protected void fireDrawableRemoved(Drawable drawable) {
 		Object[] listeners = listenerList.getListenerList();
 		for (int i = 0; i < listeners.length; i++) {
 			if (listeners[i] instanceof WorldModelListener) {
-				((WorldModelListener) listeners[i]).shapeRemoved(shape);
+				((WorldModelListener) listeners[i]).drawableRemoved(drawable);
 			}
 		}
 	}
@@ -55,38 +55,38 @@ public class WorldModel {
 		}
 	}
 	
-	/** Retourne la liste des Shape2D du monde */
-	public ArrayList<Shape2D> getListShape() {
-		return listShape;
+	/** Retourne la liste des Drawable du monde */
+	public ArrayList<Drawable> getListDrawable() {
+		return listDrawable;
 	}
 	
-	/** Retourne la Shape2D a l'indice index */
-	public Shape2D getShape(int index) {
-		return listShape.get(index);
+	/** Retourne la Drawable a l'indice index */
+	public Drawable getDrawable(int index) {
+		return listDrawable.get(index);
 	}
 	
-	/** Retourne le nombre de Shape2D present dans le monde */
-	public int getNbShape() {
-		return listShape.size();
+	/** Retourne le nombre de Drawable present dans le monde */
+	public int getNbDrawable() {
+		return listDrawable.size();
 	}
 	
-	/** Ajoute une Shape2D au monde */
-	public void add(Shape2D shape) {
-		listShape.add(shape);
-		fireShapeAdded(shape);
+	/** Ajoute une Drawable au monde */
+	public void add(Drawable drawable) {
+		listDrawable.add(drawable);
+		fireDrawableAdded(drawable);
 	}
 	
-	/** Retire une Shape2D au monde */
-	public void remove(Shape2D shape) {
-		listShape.remove(shape);
-		fireShapeRemoved(shape);
+	/** Retire une Drawable au monde */
+	public void remove(Drawable drawable) {
+		listDrawable.remove(drawable);
+		fireDrawableRemoved(drawable);
 	}
 	
-	/** Retire toutes les shapes du monde */
+	/** Retire toutes les drawables du monde */
 	public void removeAll() {
-		for (int i = getNbShape()-1; i >= 0; i--) {
-			Shape2D shape = getShape(i);
-			remove(shape);
+		for (int i = getNbDrawable()-1; i >= 0; i--) {
+			Drawable drawable = getDrawable(i);
+			remove(drawable);
 		}
 	}
 }

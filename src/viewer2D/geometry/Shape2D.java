@@ -1,11 +1,15 @@
 package viewer2D.geometry;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Stroke;
+
 import math2D.Point2D;
 import math2D.Transformation2D;
+import viewer2D.graphic.Drawable;
 
-public class Shape2D {
+public class Shape2D implements Drawable {
 	
 	private static Color defaultColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
@@ -41,18 +45,6 @@ public class Shape2D {
 	/** Retourne la Transformation2D de la Shape2D */
 	public Transformation2D getModel() {
 		return transform;
-	}
-	
-	/** Retourne le Point2D dans les coordonnees du monde */
-	public Point2D getPoint2D(Point2D point) {
-		Point2D p = new Point2D(point);
-		Point2D pt = p.translation(-getOx(), -getOy());
-		return getModel().transform(pt);
-	}
-	
-	/** Retourne le point d'indice index dans les coordonnees du monde */
-	public Point2D getPoint2D(int index) {
-		return getPoint2D(points[index]);
 	}
 	
 	/** Retourne le centre d'inertie de la Shaped2D */
@@ -151,6 +143,12 @@ public class Shape2D {
 		transform.addScale(sx, sy);
 	}
 	
+	/** Retourne le point d'indice i dans les coordonnees du monde */
+	private Point2D getPoint2D(int i) {
+		Point2D pt = new Point2D(points[i].getX() - getOx(), points[i].getY() - getOy());
+		return getTransform().transform(pt);
+	}
+	
 	/** Calcule le barycentre des Point2D */
 	private void calculateBarycenter() {
 		int npoints = getNbPoint();
@@ -159,7 +157,29 @@ public class Shape2D {
 		for (int i = 0; i < npoints; i++) {
 			bx += points[i].x;
 			by += points[i].y;
+	@Override
+	public void draw(Graphics g, Transformation2D viewprojscreen) {
+		Graphics2D g2 = (Graphics2D) g;
+		
+		int[] xpoints = new int[getNbPoint()];
+		int[] ypoints = new int[getNbPoint()];
+		
+		for (int i = 0; i < getNbPoint(); i++) {
+			Point2D proj_p = viewprojscreen.transform(getPoint2D(i));
+			xpoints[i] = (int) proj_p.getX();
+			ypoints[i] = (int) proj_p.getY();
 		}
 		this.barycenter.set(bx / npoints, by / npoints);
+		
+		g2.setColor(getColor());
+		
+		if (drawWireframe()) {
+//			if (getStroke() != null) {
+//				g2.setStroke(getStroke());
+//			}
+			g2.drawPolygon(xpoints, ypoints, getNbPoint());
+		} else {
+			g2.fillPolygon(xpoints, ypoints, getNbPoint());
+		}
 	}
 }
