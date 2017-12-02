@@ -20,7 +20,7 @@ public class Oval extends Shape2D {
 			ypoints[i] = axisB * Math.sin(radian);
 			radian += step;
 		}
-		setPoint(xpoints, ypoints, npoints);
+		setPoints(xpoints, ypoints, npoints);
 	}
 	
 	/** Retourne le demi-grand axe */

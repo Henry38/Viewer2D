@@ -36,7 +36,6 @@ public class Shape2D {
 	/** Constructeur */
 	public Shape2D(double[] xpoints, double[] ypoints, int npoints) {
 		this(new Point2D[] {});
-		setPoint(xpoints, ypoints, npoints);
 	}
 	
 	/** Retourne la Transformation2D de la Shape2D */
@@ -59,6 +58,7 @@ public class Shape2D {
 	/** Retourne le centre d'inertie de la Shaped2D */
 	public Point2D getBarycenter() {
 		return barycenter;
+		setPoints(xpoints, ypoints, npoints);
 	}
 	
 	/** Retourne le nombre de points */
@@ -127,7 +127,7 @@ public class Shape2D {
 	}
 	
 	/** Met a jour les points formant la Shape2D */
-	public void setPoint(double[] xpoints, double[] ypoints, int npoints) {
+	public void setPoints(double[] xpoints, double[] ypoints, int npoints) {
 		this.points = new Point2D[npoints];
 		for (int i = 0; i < npoints; i++) {
 			points[i] = new Point2D(xpoints[i], ypoints[i]);

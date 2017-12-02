@@ -12,7 +12,7 @@ public class Rectangle extends Shape2D {
 		this.height = height;
 		double xpoints[] = {-width/2, width/2, width/2, -width/2};
 		double ypoints[] = {-height/2, -height/2, height/2, height/2};
-		setPoint(xpoints, ypoints, 4);
+		setPoints(xpoints, ypoints, 4);
 	}
 	
 	/** Retourne la largeur */
