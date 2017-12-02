@@ -15,36 +15,28 @@ public class Shape2D implements Drawable {
 	
 	protected Base2D base;
 	protected Point2D[] points;
-	protected Point2D barycenter;
 	protected double ox, oy;
 	
 	protected Color color;
 	protected Stroke stroke;
-	protected boolean drawWireframe;	
+	protected boolean drawWireframe;
 	protected boolean drawTransform;
 	
 	/** Constructeur */
 	public Shape2D(Point2D... points) {
 		this.base = new Base2D();
 		this.points = points;
-		this.barycenter = new Point2D();
 		setOx(0);
 		setOy(0);
 		setColor(defaultColor);
 		setStroke(null);
 		drawWireframe(false);
 		drawTransform(false);
-		calculateBarycenter();
 	}
 	
 	/** Constructeur */
 	public Shape2D(double[] xpoints, double[] ypoints, int npoints) {
 		this(new Point2D[] {});
-	}
-	
-	/** Retourne le centre d'inertie de la Shaped2D */
-	public Point2D getBarycenter() {
-		return barycenter;
 		setPoints(xpoints, ypoints, npoints);
 	}
 	
@@ -124,7 +116,6 @@ public class Shape2D implements Drawable {
 		for (int i = 0; i < npoints; i++) {
 			points[i] = new Point2D(xpoints[i], ypoints[i]);
 		}
-		calculateBarycenter();
 	}
 	
 	
@@ -149,14 +140,6 @@ public class Shape2D implements Drawable {
 		return getTransform().transform(pt);
 	}
 	
-	/** Calcule le barycentre des Point2D */
-	private void calculateBarycenter() {
-		int npoints = getNbPoint();
-		double bx = 0.0;
-		double by = 0.0;
-		for (int i = 0; i < npoints; i++) {
-			bx += points[i].x;
-			by += points[i].y;
 	@Override
 	public void draw(Graphics g, Transformation2D viewprojscreen) {
 		Graphics2D g2 = (Graphics2D) g;
@@ -169,7 +152,6 @@ public class Shape2D implements Drawable {
 			xpoints[i] = (int) proj_p.getX();
 			ypoints[i] = (int) proj_p.getY();
 		}
-		this.barycenter.set(bx / npoints, by / npoints);
 		
 		g2.setColor(getColor());
 		
