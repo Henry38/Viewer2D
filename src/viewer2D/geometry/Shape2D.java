@@ -13,7 +13,7 @@ public class Shape2D implements Drawable {
 	
 	private static Color defaultColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
-	protected Transformation2D transform;
+	protected Base2D base;
 	protected Point2D[] points;
 	protected Point2D barycenter;
 	protected double ox, oy;
@@ -25,7 +25,7 @@ public class Shape2D implements Drawable {
 	
 	/** Constructeur */
 	public Shape2D(Point2D... points) {
-		this.transform = new Transformation2D();
+		this.base = new Base2D();
 		this.points = points;
 		this.barycenter = new Point2D();
 		setOx(0);
@@ -42,11 +42,6 @@ public class Shape2D implements Drawable {
 		this(new Point2D[] {});
 	}
 	
-	/** Retourne la Transformation2D de la Shape2D */
-	public Transformation2D getModel() {
-		return transform;
-	}
-	
 	/** Retourne le centre d'inertie de la Shaped2D */
 	public Point2D getBarycenter() {
 		return barycenter;
@@ -56,6 +51,11 @@ public class Shape2D implements Drawable {
 	/** Retourne le nombre de points */
 	public int getNbPoint() {
 		return points.length;
+	}
+	
+	/** Retourne la Transformation2D de la Shape2D */
+	public Transformation2D getTransform() {
+		return base;
 	}
 	
 	/** Retourne la coordonnee X de l'oigine */
@@ -130,17 +130,17 @@ public class Shape2D implements Drawable {
 	
 	/** Ajoute une translation a la transformation */
 	public void translate(double dx, double dy) {
-		transform.addTranslation(dx, dy);
+		getTransform().addTranslation(dx, dy);
 	}
 	
 	/** Ajoute une rotation a la transformation */
 	public void rotate(double radian) {
-		transform.addRotation(radian);
+		getTransform().addRotation(radian);
 	}
 	
 	/** Ajoute un changement d'echelle a la transformation */
 	public void scale(double sx, double sy) {
-		transform.addScale(sx, sy);
+		getTransform().addScale(sx, sy);
 	}
 	
 	/** Retourne le point d'indice i dans les coordonnees du monde */
@@ -180,6 +180,10 @@ public class Shape2D implements Drawable {
 			g2.drawPolygon(xpoints, ypoints, getNbPoint());
 		} else {
 			g2.fillPolygon(xpoints, ypoints, getNbPoint());
+		}
+		
+		if (drawTransform()) {
+			base.draw(g2, viewprojscreen);
 		}
 	}
 }

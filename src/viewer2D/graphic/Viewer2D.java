@@ -23,7 +23,7 @@ import viewer2D.controler.WorldModelListener;
 import viewer2D.data.Camera;
 import viewer2D.data.Viewport;
 import viewer2D.data.WorldModel;
-import math2D.Base2D;
+import viewer2D.geometry.Base2D;
 import math2D.Transformation2D;
 import math2D.Point2D;
 import math2D.Vecteur2D;
@@ -203,22 +203,12 @@ public class Viewer2D extends JComponent {
 		drawArrow(g2, point, p);
 	}
 	
-	public void drawBase(Graphics2D g2, Base2D base) {
-		g2.setStroke(axisStroke);
-		Point2D o = base.getOrigin();
-		Vecteur2D ox = base.getOx();
-		Vecteur2D oy = base.getOy();
-		g2.setColor(Color.red);
-		drawArrow(g2, o, ox);
-		g2.setColor(Color.green);
-		drawArrow(g2, o, oy);
-	}
-	
 	public void drawExternalCamera(Graphics2D g2, Camera camera) {
 		Transformation2D inverseView = camera.viewMat().getInverseTransformation();
 		Rectangle2D.Double rect = camera.getRectangle();
 		
-		drawBase(g2, inverseView.toBase2D());
+		Base2D cameraBase = new Base2D(inverseView);
+		cameraBase.draw(g2, screenMVP);
 		
 		double left = rect.getMinX();
 		double bottom = rect.getMinY();
