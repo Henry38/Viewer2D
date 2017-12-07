@@ -26,7 +26,7 @@ public class MainWindow extends JFrame {
 		Rectangle rectangle = new Rectangle(4, 2);
 		rectangle.drawTransform(true);
 		rectangle.setColor(Color.yellow);
-		world.add(rectangle);
+		world.addDrawable(rectangle);
 		
 		viewer = new Viewer2D(world, 640, 480);
 		viewer2 = new Viewer2D(world, 640, 480);

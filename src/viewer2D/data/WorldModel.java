@@ -71,13 +71,13 @@ public class WorldModel {
 	}
 	
 	/** Ajoute une Drawable au monde */
-	public void add(Drawable drawable) {
+	public void addDrawable(Drawable drawable) {
 		listDrawable.add(drawable);
 		fireDrawableAdded(drawable);
 	}
 	
 	/** Retire une Drawable au monde */
-	public void remove(Drawable drawable) {
+	public void removeDrawable(Drawable drawable) {
 		listDrawable.remove(drawable);
 		fireDrawableRemoved(drawable);
 	}
@@ -86,7 +86,7 @@ public class WorldModel {
 	public void removeAll() {
 		for (int i = getNbDrawable()-1; i >= 0; i--) {
 			Drawable drawable = getDrawable(i);
-			remove(drawable);
+			removeDrawable(drawable);
 		}
 	}
 }
