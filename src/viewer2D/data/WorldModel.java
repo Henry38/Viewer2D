@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 import javax.swing.event.EventListenerList;
 
+import listener.Viewer2DListener;
 import viewer2D.controler.WorldModelListener;
 import viewer2D.graphic.Drawable;
 
-public class WorldModel {
+public class WorldModel implements Viewer2DListener {
 	
 	protected ArrayList<Drawable> listDrawable;
 	protected EventListenerList listenerList;
@@ -89,4 +90,7 @@ public class WorldModel {
 			removeDrawable(drawable);
 		}
 	}
+	
+	public void pointPressed(double px, double py) { }
+	
 }
