@@ -2,7 +2,7 @@ package controler;
 
 import java.util.EventListener;
 
-import graphic.Drawable;
+import data.Drawable;
 
 public interface WorldModelListener extends EventListener {
 	public void drawableAdded(Drawable drawable);

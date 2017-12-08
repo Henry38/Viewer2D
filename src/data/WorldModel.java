@@ -6,7 +6,6 @@ import javax.swing.event.EventListenerList;
 
 import controler.ViewerListener;
 import controler.WorldModelListener;
-import graphic.Drawable;
 
 public class WorldModel implements ViewerListener {
 	

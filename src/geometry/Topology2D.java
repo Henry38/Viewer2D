@@ -2,7 +2,7 @@ package geometry;
 
 import java.awt.Graphics2D;
 
-import graphic.Drawable;
+import data.Drawable;
 import graphic.Viewer2D;
 import math2D.Point2D;
 import primitive.Edge;

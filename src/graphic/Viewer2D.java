@@ -22,6 +22,7 @@ import controler.CameraListener;
 import controler.ViewerListener;
 import controler.WorldModelListener;
 import data.Camera;
+import data.Drawable;
 import data.Viewport;
 import data.WorldModel;
 import geometry.Base2D;
