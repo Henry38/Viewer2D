@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 
 import controler.CameraListener;
+import controler.ViewerListener;
 import controler.WorldModelListener;
 import data.Camera;
 import data.Viewport;
 import data.WorldModel;
 import geometry.Base2D;
-import listener.Viewer2DListener;
 import math2D.Transformation2D;
 import math2D.Point2D;
 import math2D.Vecteur2D;
@@ -305,21 +305,21 @@ public class Viewer2D extends JComponent {
 	
 	
 	/** Ajoute un listener sur le modele */
-	public void addViewer2DListener(Viewer2DListener l) {
-		listenerList.add(Viewer2DListener.class, l);
+	public void addViewer2DListener(ViewerListener l) {
+		listenerList.add(ViewerListener.class, l);
 	}
 	
 	/** Retire un listener sur le modele */
-	public void removeViewer2DListener(Viewer2DListener l) {
-		listenerList.remove(Viewer2DListener.class, l);
+	public void removeViewer2DListener(ViewerListener l) {
+		listenerList.remove(ViewerListener.class, l);
 	}
 	
 	/** Notifie les listeners qui ecoute la vue */
 	private void firePointPressed(double x, double y) {
 		Object[] listeners = listenerList.getListenerList();
 		for (int i = 0; i < listeners.length; i++) {
-			if (listeners[i] instanceof Viewer2DListener) {
-				((Viewer2DListener) listeners[i]).pointPressed(x, y);
+			if (listeners[i] instanceof ViewerListener) {
+				((ViewerListener) listeners[i]).pointPressed(x, y);
 			}
 		}
 	}

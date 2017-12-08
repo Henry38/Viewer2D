@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import javax.swing.event.EventListenerList;
 
+import controler.ViewerListener;
 import controler.WorldModelListener;
 import graphic.Drawable;
-import listener.Viewer2DListener;
 
-public class WorldModel implements Viewer2DListener {
+public class WorldModel implements ViewerListener {
 	
 	protected ArrayList<Drawable> listDrawable;
 	protected EventListenerList listenerList;
