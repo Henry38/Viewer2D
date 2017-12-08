@@ -1,13 +1,13 @@
 package viewer2D.geometry;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 
 import math2D.Point2D;
 import math2D.Transformation2D;
 import viewer2D.graphic.Drawable;
+import viewer2D.graphic.Viewer2D;
 
 public class Shape2D implements Drawable {
 	
@@ -134,38 +134,21 @@ public class Shape2D implements Drawable {
 		getTransform().addScale(sx, sy);
 	}
 	
-	/** Retourne le point d'indice i dans les coordonnees du monde */
-	private Point2D getPoint2D(int i) {
-		Point2D pt = new Point2D(points[i].getX() - getOx(), points[i].getY() - getOy());
-		return getTransform().transform(pt);
-	}
-	
 	@Override
-	public void draw(Graphics g, Transformation2D viewprojscreen) {
-		Graphics2D g2 = (Graphics2D) g;
-		
-		int[] xpoints = new int[getNbPoint()];
-		int[] ypoints = new int[getNbPoint()];
-		
-		for (int i = 0; i < getNbPoint(); i++) {
-			Point2D proj_p = viewprojscreen.transform(getPoint2D(i));
-			xpoints[i] = (int) proj_p.getX();
-			ypoints[i] = (int) proj_p.getY();
-		}
-		
+	public void draw(Graphics2D g2, Viewer2D.DrawTool drawTool) {
 		g2.setColor(getColor());
 		
 		if (drawWireframe()) {
 //			if (getStroke() != null) {
 //				g2.setStroke(getStroke());
 //			}
-			g2.drawPolygon(xpoints, ypoints, getNbPoint());
+			drawTool.drawPolygon(g2, this.points);
 		} else {
-			g2.fillPolygon(xpoints, ypoints, getNbPoint());
+			drawTool.fillPolygon(g2, this.points);
 		}
 		
 		if (drawTransform()) {
-			base.draw(g2, viewprojscreen);
+			base.draw(g2, drawTool);
 		}
 	}
 }

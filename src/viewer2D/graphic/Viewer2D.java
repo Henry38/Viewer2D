@@ -53,6 +53,8 @@ public class Viewer2D extends JComponent {
 	protected Color backgroundColor = new Color(240, 240, 240, 255);
 	protected Color axisColor = new Color(0, 0, 0, 255);
 	
+	protected DrawTool drawTool = new DrawTool();
+	
 	/** Contructeur */
 	public Viewer2D(WorldModel model, int width, int height) {
 		super();
@@ -167,72 +169,6 @@ public class Viewer2D extends JComponent {
 	}
 	
 	
-	public void drawPoint(Graphics g2, Point2D point) {
-		Point2D proj_p = screenMVP.transform(point);
-		g2.fillOval((int) proj_p.getX() - 4, (int) proj_p.getY() - 4, 8, 8);
-	}
-	
-	public void drawLine(Graphics g2, Point2D point1, Point2D point2) {
-		Point2D proj_p1 = screenMVP.transform(point1);
-		Point2D proj_p2 = screenMVP.transform(point2);
-		g2.drawLine((int) proj_p1.getX(), (int) proj_p1.getY(), (int) proj_p2.getX(), (int) proj_p2.getY());
-	}
-	
-	public void drawArrow(Graphics g2, Point2D point1, Point2D point2) {
-		Point2D proj_p;
-		Point2D proj_p1 = screenMVP.transform(point1);
-		Point2D proj_p2 = screenMVP.transform(point2);
-		g2.drawLine((int) proj_p1.getX(), (int) proj_p1.getY(), (int) proj_p2.getX(), (int) proj_p2.getY());
-		
-		double dx = (0.10 * (point1.getX() - point2.getX()));
-		double dy = (0.10 * (point1.getY() - point2.getY()));
-		
-		Point2D dot = new Point2D();
-		dot.set(dx, dy);
-		dot = dot.rotation(Math.PI / 8);
-		dot = dot.translation(point2.getX(), point2.getY());
-		proj_p = screenMVP.transform(dot);
-		g2.drawLine((int) proj_p2.getX(), (int) proj_p2.getY(), (int) proj_p.getX(), (int) proj_p.getY());
-		
-		dot.set(dx, dy);
-		dot = dot.rotation(-Math.PI / 8);
-		dot = dot.translation(point2.getX(), point2.getY());
-		proj_p = screenMVP.transform(dot);
-		g2.drawLine((int) proj_p2.getX(), (int) proj_p2.getY(), (int) proj_p.getX(), (int) proj_p.getY());
-	}
-	
-	public void drawArrow(Graphics g2, Point2D point, Vecteur2D vect) {
-		Point2D p = point.translation(vect);
-		drawArrow(g2, point, p);
-	}
-	
-	public void drawExternalCamera(Graphics2D g2, Camera camera) {
-		Transformation2D inverseView = camera.viewMat().getInverseTransformation();
-		Rectangle2D.Double rect = camera.getRectangle();
-		
-		Base2D cameraBase = new Base2D(inverseView);
-		cameraBase.draw(g2, screenMVP);
-		
-		double left = rect.getMinX();
-		double bottom = rect.getMinY();
-		double right = rect.getMaxX();
-		double top = rect.getMaxY();
-		
-		// Calcul des quatres points du rectangle (repere monde)
-		Point2D bottomLeft = inverseView.transform(new Point2D(left, bottom));
-		Point2D bottomRight = inverseView.transform(new Point2D(right, bottom));
-		Point2D topLeft = inverseView.transform(new Point2D(left, top));
-		Point2D topRight = inverseView.transform(new Point2D(right, top));
-		
-		g2.setColor(Color.darkGray);
-		g2.setStroke(gridStroke);
-		
-		drawLine(g2, bottomLeft, bottomRight);
-		drawLine(g2, bottomRight, topRight);
-		drawLine(g2, topRight, topLeft);
-		drawLine(g2, topLeft, bottomLeft);
-	}
-	
 	public void drawAxis(Graphics2D g2) {
 		Point2D point1 = new Point2D();
 		Point2D point2 = new Point2D();
@@ -244,10 +180,10 @@ public class Viewer2D extends JComponent {
 		g2.setStroke(axisStroke);
 		point2.setX(1);
 		point2.setY(0);
-		drawArrow(g2, point1, point2);
+		drawTool.drawArrow(g2, point1, point2);
 		point2.setX(0);
 		point2.setY(1);
-		drawArrow(g2, point1, point2);
+		drawTool.drawArrow(g2, point1, point2);
 	}
 	
 	public void drawGrid(Graphics2D g2) {
@@ -304,8 +240,8 @@ public class Viewer2D extends JComponent {
 			} else {
 				g2.setColor(Color.gray);
 				g2.setStroke(gridStroke);
-			}
-			drawLine(g2, point1, point2);
+//			}
+			drawTool.drawLine(g2, point1, point2);
 		}
 		point1.setX(minX);
 		point2.setX(maxX);
@@ -318,8 +254,8 @@ public class Viewer2D extends JComponent {
 			} else {
 				g2.setColor(Color.gray);
 				g2.setStroke(gridStroke);
-			}
-			drawLine(g2, point1, point2);
+//			}
+			drawTool.drawLine(g2, point1, point2);
 		}
 	}
 	
@@ -351,12 +287,12 @@ public class Viewer2D extends JComponent {
 		
 		if (getModel() != null) {
 			for (Drawable drawable : getModel().getListDrawable()) {
-				drawable.draw(g2, screenMVP);
+				drawable.draw(g2, this.drawTool);
 		}
 		
 		// Affichage des cameras externes
 		for (Camera camera : externCamera) {
-			drawExternalCamera(g2, camera);
+			drawTool.drawCamera(g2, camera);
 		}
 		
 //		if (eventButton == 2) {
@@ -387,6 +323,104 @@ public class Viewer2D extends JComponent {
 		}
 	}
 	
+	
+	public class DrawTool {
+		
+		public void drawPoint(Graphics g2, Point2D point) {
+			Point2D proj_p = screenMVP.transform(point);
+			g2.fillOval((int) proj_p.getX() - 4, (int) proj_p.getY() - 4, 8, 8);
+		}
+		
+		public void drawLine(Graphics g2, Point2D point1, Point2D point2) {
+			Point2D proj_p1 = screenMVP.transform(point1);
+			Point2D proj_p2 = screenMVP.transform(point2);
+			g2.drawLine((int) proj_p1.getX(), (int) proj_p1.getY(), (int) proj_p2.getX(), (int) proj_p2.getY());
+		}
+		
+		public void drawArrow(Graphics g2, Point2D point1, Point2D point2) {
+			Point2D proj_p;
+			Point2D proj_p1 = screenMVP.transform(point1);
+			Point2D proj_p2 = screenMVP.transform(point2);
+			g2.drawLine((int) proj_p1.getX(), (int) proj_p1.getY(), (int) proj_p2.getX(), (int) proj_p2.getY());
+			
+			double dx = (0.10 * (point1.getX() - point2.getX()));
+			double dy = (0.10 * (point1.getY() - point2.getY()));
+			
+			Point2D dot = new Point2D();
+			dot.set(dx, dy);
+			dot = dot.rotation(Math.PI / 8);
+			dot = dot.translation(point2.getX(), point2.getY());
+			proj_p = screenMVP.transform(dot);
+			g2.drawLine((int) proj_p2.getX(), (int) proj_p2.getY(), (int) proj_p.getX(), (int) proj_p.getY());
+			
+			dot.set(dx, dy);
+			dot = dot.rotation(-Math.PI / 8);
+			dot = dot.translation(point2.getX(), point2.getY());
+			proj_p = screenMVP.transform(dot);
+			g2.drawLine((int) proj_p2.getX(), (int) proj_p2.getY(), (int) proj_p.getX(), (int) proj_p.getY());
+		}
+		
+		public void drawArrow(Graphics g2, Point2D point, Vecteur2D vect) {
+			Point2D p = point.translation(vect);
+			drawArrow(g2, point, p);
+		}
+		
+		public void drawPolygon(Graphics g2, Point2D... points) {
+			int nbPoints = points.length;
+			int[] xpoints = new int[nbPoints];
+			int[] ypoints = new int[nbPoints];
+			
+			for (int i = 0; i < nbPoints; i++) {
+				xpoints[i] = (int) points[i].getX();
+				ypoints[i] = (int) points[i].getY();
+			}
+			
+			g2.drawPolygon(xpoints, ypoints, nbPoints);
+		}
+		
+		public void fillPolygon(Graphics g2, Point2D... points) {
+			int nbPoints = points.length;
+			int[] xpoints = new int[nbPoints];
+			int[] ypoints = new int[nbPoints];
+			
+			for (int i = 0; i < nbPoints; i++) {
+				Point2D p = points[i];
+				Point2D proj_p = screenMVP.transform(p);
+				xpoints[i] = (int) proj_p.getX();
+				ypoints[i] = (int) proj_p.getY();
+			}
+			
+			g2.fillPolygon(xpoints, ypoints, nbPoints);
+		}
+		
+		public void drawCamera(Graphics2D g2, Camera camera) {
+			Transformation2D inverseView = camera.viewMat().getInverseTransformation();
+			Rectangle2D.Double rect = camera.getRectangle();
+			
+			Base2D cameraBase = new Base2D(inverseView);
+			cameraBase.draw(g2, this);
+			
+			double left = rect.getMinX();
+			double bottom = rect.getMinY();
+			double right = rect.getMaxX();
+			double top = rect.getMaxY();
+			
+			// Calcul des quatres points du rectangle (repere monde)
+			Point2D bottomLeft = inverseView.transform(new Point2D(left, bottom));
+			Point2D bottomRight = inverseView.transform(new Point2D(right, bottom));
+			Point2D topLeft = inverseView.transform(new Point2D(left, top));
+			Point2D topRight = inverseView.transform(new Point2D(right, top));
+			
+			g2.setColor(Color.darkGray);
+			g2.setStroke(gridStroke);
+			
+			drawLine(g2, bottomLeft, bottomRight);
+			drawLine(g2, bottomRight, topRight);
+			drawLine(g2, topRight, topLeft);
+			drawLine(g2, topLeft, bottomLeft);
+		}
+	}
+	
 	/** Classe qui ecoute le modele et les click utilisateur */
 	private class Handler extends MouseAdapter implements WorldModelListener, CameraListener, MouseMotionListener, MouseWheelListener, ComponentListener {
 		
@@ -395,10 +429,10 @@ public class Viewer2D extends JComponent {
 		///
 		@Override
 		public void drawableAdded(Drawable drawable) { }
-
+		
 		@Override
 		public void drawableRemoved(Drawable drawable) { }
-
+		
 		@Override
 		public void needRefresh() {
 			repaint();

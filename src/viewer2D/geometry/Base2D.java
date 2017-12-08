@@ -1,13 +1,13 @@
 package viewer2D.geometry;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import math2D.Point2D;
 import math2D.Transformation2D;
 import math2D.Vecteur2D;
 import viewer2D.graphic.Drawable;
+import viewer2D.graphic.Viewer2D;
 
 public class Base2D extends Transformation2D implements Drawable {
 	
@@ -64,22 +64,15 @@ public class Base2D extends Transformation2D implements Drawable {
 	}
 	
 	@Override
-	public void draw(Graphics g, Transformation2D viewprojscreen) {
-		Graphics2D g2 = (Graphics2D) g;
-		
+	public void draw(Graphics2D g2, Viewer2D.DrawTool drawTool) {
 		Point2D o = getOrigin();
 		Vecteur2D ox = getOx();
 		Vecteur2D oy = getOy();
-		Point2D p1 = o.translation(ox);
-		Point2D p2 = o.translation(oy);
-		Point2D proj_o = viewprojscreen.transform(o);
-		Point2D proj_p1 = viewprojscreen.transform(p1);
-		Point2D proj_p2 = viewprojscreen.transform(p2);
 		
 		g2.setColor(Color.red);
-		g2.drawLine((int) proj_o.getX(), (int) proj_o.getY(), (int) proj_p1.getX(), (int) proj_p1.getY());
+		drawTool.drawArrow(g2, o, ox);
 		
 		g2.setColor(Color.green);
-		g2.drawLine((int) proj_o.getX(), (int) proj_o.getY(), (int) proj_p2.getX(), (int) proj_p2.getY());
+		drawTool.drawArrow(g2, o, oy);
 	}
 }
