@@ -1,13 +1,13 @@
-package viewer2D.data;
+package data;
 
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.event.EventListenerList;
 
+import controler.CameraListener;
 import math2D.Point2D;
 import math2D.Transformation2D;
 import math2D.Vecteur2D;
-import viewer2D.controler.CameraListener;
 
 public class Camera {
 	

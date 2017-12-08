@@ -1,12 +1,12 @@
-package viewer2D.geometry;
+package geometry;
 
 import java.awt.Graphics2D;
 
+import graphic.Drawable;
+import graphic.Viewer2D;
 import math2D.Point2D;
 import primitive.Edge;
 import topology.BaseMeshTopology;
-import viewer2D.graphic.Drawable;
-import viewer2D.graphic.Viewer2D;
 
 public class Topology2D<T extends Point2D> implements Drawable {
 	

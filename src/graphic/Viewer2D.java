@@ -1,4 +1,4 @@
-package viewer2D.graphic;
+package graphic;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -18,13 +18,13 @@ import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
+import controler.CameraListener;
+import controler.WorldModelListener;
+import data.Camera;
+import data.Viewport;
+import data.WorldModel;
+import geometry.Base2D;
 import listener.Viewer2DListener;
-import viewer2D.controler.CameraListener;
-import viewer2D.controler.WorldModelListener;
-import viewer2D.data.Camera;
-import viewer2D.data.Viewport;
-import viewer2D.data.WorldModel;
-import viewer2D.geometry.Base2D;
 import math2D.Transformation2D;
 import math2D.Point2D;
 import math2D.Vecteur2D;

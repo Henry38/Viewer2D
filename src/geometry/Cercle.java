@@ -1,4 +1,6 @@
-package viewer2D.geometry;
+package geometry;
+
+import viewer2D.geometry.Oval;
 
 public class Cercle extends Oval {
 	

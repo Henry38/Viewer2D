@@ -1,12 +1,12 @@
-package viewer2D.data;
+package data;
 
 import java.util.ArrayList;
 
 import javax.swing.event.EventListenerList;
 
+import controler.WorldModelListener;
+import graphic.Drawable;
 import listener.Viewer2DListener;
-import viewer2D.controler.WorldModelListener;
-import viewer2D.graphic.Drawable;
 
 public class WorldModel implements Viewer2DListener {
 	

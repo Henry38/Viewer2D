@@ -7,9 +7,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import viewer2D.data.WorldModel;
-import viewer2D.geometry.Rectangle;
-import viewer2D.graphic.Viewer2D;
+import data.WorldModel;
+import geometry.Rectangle;
+import graphic.Viewer2D;
 
 public class MainWindow extends JFrame {
 	

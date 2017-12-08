@@ -1,4 +1,4 @@
-package viewer2D.controler;
+package controler;
 
 import java.util.EventListener;
 

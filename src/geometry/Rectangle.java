@@ -1,4 +1,6 @@
-package viewer2D.geometry;
+package geometry;
+
+import geometry.Shape2D;
 
 public class Rectangle extends Shape2D {
 	

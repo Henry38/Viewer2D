@@ -1,13 +1,13 @@
-package viewer2D.geometry;
+package geometry;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 
+import graphic.Drawable;
+import graphic.Viewer2D;
 import math2D.Point2D;
 import math2D.Transformation2D;
-import viewer2D.graphic.Drawable;
-import viewer2D.graphic.Viewer2D;
 
 public class Shape2D implements Drawable {
 	

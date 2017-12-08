@@ -1,8 +1,8 @@
-package viewer2D.controler;
+package controler;
 
 import java.util.EventListener;
 
-import viewer2D.graphic.Drawable;
+import graphic.Drawable;
 
 public interface WorldModelListener extends EventListener {
 	public void drawableAdded(Drawable drawable);
