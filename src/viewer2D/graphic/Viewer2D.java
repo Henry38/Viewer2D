@@ -240,7 +240,7 @@ public class Viewer2D extends JComponent {
 			} else {
 				g2.setColor(Color.gray);
 				g2.setStroke(gridStroke);
-//			}
+			}
 			drawTool.drawLine(g2, point1, point2);
 		}
 		point1.setX(minX);
@@ -254,7 +254,7 @@ public class Viewer2D extends JComponent {
 			} else {
 				g2.setColor(Color.gray);
 				g2.setStroke(gridStroke);
-//			}
+			}
 			drawTool.drawLine(g2, point1, point2);
 		}
 	}
@@ -288,6 +288,7 @@ public class Viewer2D extends JComponent {
 		if (getModel() != null) {
 			for (Drawable drawable : getModel().getListDrawable()) {
 				drawable.draw(g2, this.drawTool);
+			}
 		}
 		
 		// Affichage des cameras externes
