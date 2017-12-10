@@ -373,8 +373,10 @@ public class Viewer2D extends JComponent {
 			int[] ypoints = new int[nbPoints];
 			
 			for (int i = 0; i < nbPoints; i++) {
-				xpoints[i] = (int) points[i].getX();
-				ypoints[i] = (int) points[i].getY();
+				Point2D p = points[i];
+				Point2D proj_p = screenMVP.transform(p);
+				xpoints[i] = (int) proj_p.getX();
+				ypoints[i] = (int) proj_p.getY();
 			}
 			
 			g2.drawPolygon(xpoints, ypoints, nbPoints);
