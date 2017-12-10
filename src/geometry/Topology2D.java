@@ -10,7 +10,7 @@ import topology.BaseMeshTopology;
 
 public class Topology2D<T extends Point2D> implements Drawable {
 	
-	private BaseMeshTopology<T> topology;
+	protected BaseMeshTopology<T> topology;
 	
 	/** Constructeur */
 	public Topology2D(BaseMeshTopology<T> topology) {
