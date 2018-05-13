@@ -1,5 +1,6 @@
 package geometry;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 import data.Drawable;
@@ -13,12 +14,16 @@ import topology.BaseMeshTopology;
 
 public class Topology2D<T extends Point2D> implements Drawable {
 	
+	private static Color defaultColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+	
 	protected BaseMeshTopology<T> topology;
 	public boolean drawPositions;
 	public boolean drawEdges;
 	public boolean drawTriangles;
 	public boolean drawQuads;
 	public boolean drawFaces;
+	
+	protected Color color;
 	
 	/** Constructeur */
 	public Topology2D(BaseMeshTopology<T> topology) {
@@ -28,10 +33,22 @@ public class Topology2D<T extends Point2D> implements Drawable {
 		this.drawTriangles = false;
 		this.drawQuads = false;
 		this.drawFaces = false;
+		setColor(defaultColor);
+	}
+	
+	/** Retourne la couleur de la Shape2D */
+	public Color getColor() {
+		return color;
+	}
+	
+	/** Met a jour la couleur */
+	public void setColor(Color color) {
+		this.color = color;
 	}
 	
 	@Override
 	public void draw(Graphics2D g2, Viewer2D.DrawTool drawTool) {
+		g2.setColor(getColor());
 		
 		if (drawPositions) {
 			for (Point2D p : topology.getPositions()) {
